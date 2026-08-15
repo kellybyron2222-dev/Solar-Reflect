@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orbital sunlight — the model</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]});"></script>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #555;
+      --rule: #ddd;
+      --card: #f6f6f4;
+      --accent: #1f4e79;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #eee;
+        --muted: #aaa;
+        --rule: #333;
+        --card: #1e1e1e;
+        --accent: #8cb4d9;
+      }
+      body { background: #121212; }
+    }
+    body {
+      font: 18px/1.55 Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      max-width: 42rem;
+      margin: 2rem auto;
+      padding: 0 1.25rem 4rem;
+    }
+    h1, h2, h3 { font-family: "Segoe UI", system-ui, sans-serif; font-weight: 650; letter-spacing: -0.02em; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .lede { color: var(--muted); font-size: 1.05rem; margin-top: 0; }
+    h2 { font-size: 1.2rem; margin-top: 2.25rem; border-top: 1px solid var(--rule); padding-top: 1.25rem; }
+    .card {
+      background: var(--card);
+      padding: 1rem 1.15rem;
+      margin: 1rem 0;
+      border-radius: 6px;
+    }
+    .plain {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 0.92rem;
+      overflow-wrap: anywhere;
+      margin: 0.35rem 0 0;
+    }
+    .why { color: var(--muted); font-size: 0.95rem; margin: 0.5rem 0 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+    th, td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    th { font-family: "Segoe UI", system-ui, sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .num { font-variant-numeric: tabular-nums; font-family: Consolas, monospace; }
+    .katex-display { margin: 0.6rem 0 !important; }
+    a { color: var(--accent); }
+    nav { font-family: "Segoe UI", system-ui, sans-serif; font-size: 0.9rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <nav>Solar Reflect · readable model notebook · not the results yet</nav>
+  <h1>Orbital sunlight on Earth</h1>
+  <p class="lede">What the math is saying, in order. Open this file in a browser so the equations typeset. Each equation also has a one-line plain version.</p>
+
+  <h2>What we are asking</h2>
+  <p>Imagine a flat mirror in low Earth orbit that reflects sunlight onto the ground. For a given <strong>collecting area</strong> (how big the mirror is) and <strong>altitude</strong> (how high it flies), three numbers fall out:</p>
+  <ol>
+    <li><strong>How bright</strong> is the patch on the ground? (watts per square metre)</li>
+    <li><strong>How big</strong> is that patch? (kilometres across)</li>
+    <li><strong>How long</strong> does an overhead pass last? (minutes)</li>
+  </ol>
+  <p>Then: which physical fact binds first — <em>not enough collected energy</em> (the Sun is a disk, so the patch cannot be squeezed arbitrarily small and bright), or <em>the satellite races past</em> (the orbital shutter)?</p>
+  <p>Uses such as moonlight, street lighting, or solar panels are compared <em>after</em> those three numbers exist. Cost, companies, and 3D pictures are not this model.</p>
+  <p>The geometry is dusk/dawn, looking straight down: the satellite is over the terminator, the ground site is at the satellite’s footpoint, the Sun is 90° from nadir, so the mirror is folded at 45°. That is <strong>not</strong> midnight over a dark city.</p>
+
+  <h2>Names (say them out loud)</h2>
+  <table>
+    <tr><th>Name</th><th>Symbol</th><th>Meaning</th></tr>
+    <tr><td>Altitude</td><td>$h$</td><td>Height above Earth. Grid: 400, 625, 1000, 2000 km.</td></tr>
+    <tr><td>Collecting area</td><td>$A$</td><td>Mirror area in m². Example markers: 18 m square, 55 m square, 1 km square.</td></tr>
+    <tr><td>Optical factor</td><td>$\eta$</td><td>Mirror reflectance × atmosphere. Ideal = 1. Estimated clear sky = 0.9 × 0.75 = 0.675.</td></tr>
+    <tr><td>Solar constant</td><td>$E_0$</td><td>Sunlight in space: 1361 W/m² (AM0, above the atmosphere).</td></tr>
+    <tr><td>Fold angle</td><td>$\gamma$</td><td>Incidence on the collector. Frozen at 45° for this snapshot. Not the Sun’s zenith angle on the ground.</td></tr>
+    <tr><td>Elevation</td><td>$\varepsilon$</td><td>How high the satellite sits in the sky from the ground site. Brightness uses 90° (straight up). Timing uses a 30° cut.</td></tr>
+    <tr><td>Sun’s angular size</td><td>$\alpha$</td><td>Full width of the solar disk as seen from Earth: 0.0093 radians (~0.53°).</td></tr>
+    <tr><td>Slant range</td><td>$d$</td><td>Mirror-to-ground distance. Looking straight down, $d = h$.</td></tr>
+    <tr><td>Patch diameter</td><td>$D$</td><td>Width of the Sun’s image on the ground.</td></tr>
+    <tr><td>Patch area</td><td>$A_{\mathrm{image}}$</td><td>Area of that disk.</td></tr>
+    <tr><td>Peak irradiance</td><td>$I$</td><td>Brightness on the filled patch, W/m².</td></tr>
+    <tr><td>Useful dwell</td><td>$T_{\mathrm{useful}}$</td><td>Time the satellite is above 30° elevation on an overhead pass.</td></tr>
+  </table>
+
+  <h2>1. How big is the patch?</h2>
+  <p>The Sun is not a point. It is a disk. A mirror — flat or focusing — cannot make a ground spot smaller than the Sun’s angular size times the distance to the ground.</p>
+  <div class="card">
+    $$d = h \qquad D = d\,\alpha \qquad A_{\mathrm{image}} = \pi \left(\frac{D}{2}\right)^2$$
+    <p class="plain">d = h</p>
+    <p class="plain">D = d * alpha</p>
+    <p class="plain">A_image = pi * (D / 2)^2</p>
+    <p class="why">Focusing does not shrink D. Compute D in metres before squaring. Alpha is the full solar diameter, not the radius.</p>
+  </div>
+  <p>At 625 km: D = 5.8 km. The 55 m mirror is a speck inside that patch. Brightness is collected watts spread over that whole disk, not a searchlight beam.</p>
+
+  <h2>2. How bright is the patch?</h2>
+  <p>Power collected by the mirror, then spread over the solar image on the ground. Not inverse-square from a lamp.</p>
+  <div class="card">
+    $$I = \frac{E_0\,\eta\,A\cos\gamma\sin\varepsilon}{\pi (d\alpha/2)^2}$$
+    <p class="plain">I = E0 * eta * A * cos(gamma) * sin(epsilon) / A_image</p>
+    <p class="why">For the snapshot: epsilon = 90°, so sin(epsilon) = 1. gamma = 45°, so cos(gamma) = 0.707. Pass eta as one number (1 or 0.675). Do not multiply eta, rho, and tau together.</p>
+  </div>
+  <p>In words: sunlight in space × efficiency × mirror area × cosine of the fold, divided by the area of the Sun’s image on the ground.</p>
+  <p>I scales with A (bigger mirror, more watts). I scales as 1/h² because the patch area grows with h² — that is the solar disk, not a lightbulb. Clouds are not in this peak-I formula (clear-sky envelope only).</p>
+
+  <h2>3. How long does a pass last?</h2>
+  <p>The satellite is in a circular orbit. Period uses the orbit radius (Earth radius plus altitude), not altitude alone.</p>
+  <div class="card">
+    $$a = R_E + h \qquad T = 2\pi\sqrt{a^3/\mu}$$
+    <p class="plain">a = R_earth + h</p>
+    <p class="plain">T_period = 2 * pi * sqrt(a^3 / mu)</p>
+    <p class="why">mu is Earth’s gravitational parameter. Using sqrt(h^3 / mu) would be wrong by a huge factor.</p>
+  </div>
+  <p>From the ground, the satellite is “useful” while its elevation is above 30°. The Earth-central angle from overhead to that contour is:</p>
+  <div class="card">
+    $$\theta(\varepsilon) = \arccos\!\big((R_E/a)\cos\varepsilon\big) - \varepsilon$$
+    $$T_{\mathrm{useful}} = T \cdot \theta(\varepsilon_{\min}) / \pi$$
+    <p class="plain">theta(eps) = arccos((R_earth / a) * cos(eps)) - eps &nbsp; (angles in radians)</p>
+    <p class="plain">T_useful = T_period * theta(30°) / pi</p>
+    <p class="why">That is the full overhead (zenith-track) window. Off-track passes are shorter. Eclipse is not subtracted. T_useful is in seconds in the code; divide by 60 for minutes.</p>
+  </div>
+  <p>An energy-per-pass envelope is I times T_useful. That is an <strong>upper bound</strong>: brightness is not constant through the pass, and night-side shadow is not cut out.</p>
+
+  <h2>Worked example (checked)</h2>
+  <p>Altitude 625 km, 55 m square mirror (A = 3025 m²), looking straight down at dusk/dawn. These numbers match the calculator and the tests to better than 1%.</p>
+  <table>
+    <tr><th>Quantity</th><th>Ideal (η = 1)</th><th>Estimated (η = 0.675)</th></tr>
+    <tr><td>Patch diameter D</td><td colspan="2" class="num">5.81 km</td></tr>
+    <tr><td>Patch area</td><td colspan="2" class="num">2.65 × 10⁷ m²</td></tr>
+    <tr><td>Peak irradiance I</td><td class="num">0.110 W/m²</td><td class="num">0.074 W/m²</td></tr>
+  </table>
+  <p>For scale: full sunlight on the ground is about 1000 W/m². Full moonlight is on the order of 0.003 W/m² (estimated). A 55 m mirror at 625 km is far closer to moonlight-class than to daylight.</p>
+  <p>That is a <em>calibration point</em>, not the study. The study still has to sweep area and altitude, then sit the numbers against lighting and PV thresholds.</p>
+
+  <h2>Where the files are</h2>
+  <ul>
+    <li>This notebook (readable): <code>notebooks/the_model.html</code></li>
+    <li>Same logic, live numbers in Cursor: <code>notebooks/the_model.ipynb</code></li>
+    <li>Contract: <code>spec.md</code> · calculator: <code>src/physics.py</code></li>
+    <li>Question freeze: <code>framing.md</code></li>
+  </ul>
+  <p class="why">The <code>carry/</code> and <code>phases/</code> folders are process notes, not the analysis.</p>
+</body>
+</html>

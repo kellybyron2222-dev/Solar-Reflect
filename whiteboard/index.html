@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drafting board</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="mark"></div>
+      <div>
+        <h1>Drafting board</h1>
+        <p>Load a file. Read typeset math. Click through key items to approve, decline, or modify.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <label class="btn">Open files
+        <input id="file-input" type="file" multiple hidden
+          accept=".md,.markdown,.txt,.yaml,.yml,.py,.html,.htm,.csv,.json">
+      </label>
+      <button type="button" class="btn" id="btn-folder">Open folder</button>
+      <button type="button" class="btn" id="btn-pack">Review key files</button>
+      <button type="button" class="btn ghost" id="btn-export">Export decisions</button>
+    </div>
+  </header>
+
+  <div class="modes">
+    <button type="button" class="mode on" data-mode="read">Read</button>
+    <button type="button" class="mode" data-mode="logic">Logic</button>
+    <button type="button" class="mode" data-mode="review">Review</button>
+  </div>
+
+  <div id="serve-hint" class="banner hidden">
+    Folder listing needs a local server. From the project folder run
+    <code>python whiteboard/serve.py</code>
+    then use the library on the left — or just Open files.
+  </div>
+
+  <main class="desk">
+    <aside class="rail left">
+      <h2>Library</h2>
+      <div id="library"></div>
+      <h2>Opened</h2>
+      <div id="opened"></div>
+      <h2 id="list-heading">On this page</h2>
+      <nav id="outline"></nav>
+      <div id="item-list" class="hidden"></div>
+    </aside>
+
+    <section class="paper-wrap">
+      <div id="drop" class="drop">
+        <div id="paper" class="paper">
+          <div class="empty">
+            <h2>Nothing on the table yet</h2>
+            <p id="empty-open">Open a file from the library (if the server is running), or use <strong>Open files</strong>.</p>
+            <p>Review walks <strong>concepts</strong> — not every table cell. Each card states what you are deciding, then the source text.</p>
+            <p id="empty-pack"><strong>Review key files</strong> loads the pack in <code>board.config.json</code>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rail right">
+      <div id="rail-read">
+        <h2>Formulas in view</h2>
+        <div id="formula-rail" class="formula-rail"><p class="quiet">Load a note to extract display equations.</p></div>
+        <h2>File notes</h2>
+        <label class="quiet" for="status">Status for this file</label>
+        <select id="status">
+          <option value="">—</option>
+          <option value="ok">OK / freeze</option>
+          <option value="nit">Nits</option>
+          <option value="hold">Hold</option>
+          <option value="gap">Gap</option>
+        </select>
+        <textarea id="notes" placeholder="Gaps, flaws, wording to change, questions for the next pass…"></textarea>
+        <p class="quiet" id="notes-meta"></p>
+      </div>
+      <div id="rail-review" class="hidden">
+        <h2>This concept</h2>
+        <p class="quiet" id="queue-progress">No queue yet.</p>
+        <label class="quiet" for="item-note">If you disagree, say what should change</label>
+        <textarea id="item-note" placeholder="Required on Disagree. Optional on Agree."></textarea>
+        <p class="quiet">Keys: A agree · X disagree · ← →</p>
+        <p class="quiet" id="save-meta">Votes save into the markdown in this repo when the local server is running.</p>
+      </div>
+    </aside>
+  </main>
+
+  <div id="term-pop" hidden>
+    <strong id="term-pop-word"></strong>
+    <p id="term-pop-def"></p>
+    <a id="term-pop-wiki" target="_blank" rel="noopener">Wikipedia →</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@13.0.3/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

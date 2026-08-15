@@ -1,0 +1,15 @@
+{
+  "items": {
+    "concept:framing-geometry": {
+      "id": "concept:framing-geometry",
+      "verdict": "agree",
+      "note": "Accepted iteration: keep terminator-nadir. Midnight overhead is usually umbra; dark-site lighting is off-nadir and parked.",
+      "title": "Dusk/dawn snapshot, not midnight",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Keep terminator-nadir (sunlit dusk/dawn footpoint) as the brightness envelope, because a mirror overhead at local midnight is usually in Earth’s shadow and has nothing to bounce. Dark-city lighting is a different, parked geometry. Treat 18 m / 55 m / 1 km as scale markers, not architectures. Keep the 400–2000 km grid; GEO is a size check only.",
+      "updated": "2026-08-14 19:54"
+    }
+  },
+  "notes": {}
+}

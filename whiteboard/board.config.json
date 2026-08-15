@@ -1,0 +1,168 @@
+{
+  "id": "solar-reflect",
+  "title": "Drafting board",
+  "subtitle": "Load a file. Read typeset math. Agree or disagree with recommended actions.",
+  "packLabel": "Review framework",
+  "library": [
+    {
+      "group": "Framework (start here)",
+      "files": [
+        ["framing.md", "Framing — the question"],
+        ["spec.md", "Spec — the equations"],
+        ["notebooks/the_model.html", "Readable model note"],
+        ["tests/hand_625.md", "Worked example 625 km"],
+        ["observations.md", "Observations log"],
+        ["formulas.md", "Formulas log"],
+        ["constants.yaml", "Constants"]
+      ]
+    },
+    {
+      "group": "Plan",
+      "files": [
+        ["MASTER_OUTLINE.md", "Master outline"],
+        ["phases/D_visuals.md", "Phase D visuals"],
+        ["phases/E_campaigns.md", "Phase E campaigns"],
+        ["phases/F_assessment.md", "Phase F assessment"]
+      ]
+    },
+    {
+      "group": "Final figures",
+      "files": [
+        ["figures/final/s-geo-2d.svg", "S-geo-2d — locked (flat foil)"]
+      ]
+    },
+    {
+      "group": "Working figures",
+      "files": [
+        ["figures/working/s-geo-2d.svg", "S-geo-2d — Sun is a disk"],
+        ["figures/working/s-geo-2d-curved.svg", "S-geo-2d-curved — concave foil"],
+        ["figures/working/s-spot-h.svg", "S-spot-h — D vs altitude"],
+        ["figures/working/s-focus.svg", "S-focus — focusing does not shrink D"]
+      ]
+    }
+  ],
+  "pack": [
+    ["framing.md", "Framing"],
+    ["spec.md", "Spec"],
+    ["tests/hand_625.md", "625 km example"]
+  ],
+  "concepts": [
+    {
+      "id": "framing-question",
+      "file": "framing.md",
+      "heading": "1. Question",
+      "title": "The question",
+      "recommend": "Freeze the question as: how bright, how big, and how long is the ground patch at dusk/dawn looking straight down? Then: does energy or the orbital shutter bind first. Lighting/PV wait until those numbers exist.",
+      "simple": "This card only freezes the question, not the formulas. Bright = how intense the light is. Big = how wide the lit patch is. Long = how many minutes it lasts as the satellite flies over. Dusk/dawn looking straight down is the snapshot. Uses (street lighting, solar panels) come later.",
+      "decide": "Should this study ask: for a given mirror area and altitude, how bright, how big, and how long is the ground patch at dusk/dawn looking straight down — and does energy (Sun as a disk) or the orbital shutter bind first? Uses like lighting or PV wait until those numbers exist."
+    },
+    {
+      "id": "framing-variables",
+      "file": "framing.md",
+      "heading": "2. Variable map",
+      "title": "What we vary vs what we freeze",
+      "recommend": "Vary only altitude, area, and optical factor. Keep fold 45° and nadir 90° as a frozen snapshot. Do not let lighting or PV thresholds choose the model.",
+      "simple": "We will change how high the mirror flies, how large it is, and how efficient the optics are. We will not, in this version, sweep lots of sun angles. Lighting and solar-farm targets sit in a parking lot until the physics numbers exist.",
+      "decide": "Independents are altitude, area, and optical factor. Fold angle 45° and nadir 90° are a frozen snapshot, not a sweep. Lighting/PV thresholds are parked and must not drive the model."
+    },
+    {
+      "id": "framing-geometry",
+      "file": "framing.md",
+      "heading": "3. Grid, snapshot, markers",
+      "title": "Dusk/dawn snapshot, not midnight",
+      "recommend": "Keep terminator-nadir (sunlit dusk/dawn footpoint) as the brightness envelope, because a mirror overhead at local midnight is usually in Earth’s shadow and has nothing to bounce. Dark-city lighting is a different, parked geometry. Treat 18 m / 55 m / 1 km as scale markers, not architectures. Keep the 400–2000 km grid; GEO is a size check only.",
+      "simple": "The satellite is over the day/night line, and we look at the ground directly below it. That ground is in twilight, not deep night. Midnight overhead is usually Earth’s shadow: no sunlight hits the mirror, so there is nothing to reflect. Lighting a dark city needs a sideways shot from a still-sunlit satellite — a different problem, parked for later. The 18 m and 55 m sizes are examples so we can picture scale — they are not “the products under test.”",
+      "decide": "The brightness envelope is terminator-nadir (sunlit dusk/dawn footpoint), not zenith over a dark city. 18 m / 55 m / 1 km are scale markers, not architectures under test. Altitudes 400–2000 km; GEO is a one-line size check only."
+    },
+    {
+      "id": "framing-glossary",
+      "file": "framing.md",
+      "heading": "4. Glossary",
+      "title": "The Sun is a disk, not a lamp",
+      "recommend": "Treat the ground patch as the Sun’s image. Focusing cannot shrink it. Binders are energy (including that dilution) or shutter — not cost, not “spot too small.”",
+      "simple": "The Sun is not a point of light. It is a disk with a real angular size. A mirror in orbit therefore paints a large fuzzy copy of that disk on the ground. You cannot focus that copy down to a city-block spotlight. The light is spread over kilometres, so it is dim unless the mirror is huge.",
+      "decide": "The ground patch is the Sun’s image. Focusing cannot shrink it. Binding facts are energy (including that dilution) or shutter — not “spot too small,” and not a cost verdict."
+    },
+    {
+      "id": "framing-classes",
+      "file": "framing.md",
+      "heading": "5. Parked application classes",
+      "title": "How we will score uses later",
+      "recommend": "Keep moonlight / lighting / weak PV / energy / daylight as parked estimated bins for a later readout. They must not choose area, altitude, or efficiency.",
+      "simple": "Later we will ask “is this as bright as moonlight? as a street? enough for a solar panel?” Those comparison numbers are parked on purpose. If we used them now, we would quietly change the physics to chase a use case.",
+      "decide": "Moonlight / lighting / weak PV / energy / daylight are magnitude bins for a later readout. They are estimated, not codes or standards. They must not choose area, altitude, or efficiency."
+    },
+    {
+      "id": "framing-scope",
+      "file": "framing.md",
+      "heading": "6. Out of scope",
+      "title": "What we are not modeling",
+      "recommend": "Keep cost, clouds-as-peak-I, eclipse on the pass, 3D, daytime geometry, and company evaluation out of this version. Peak I stays a clear-sky envelope.",
+      "simple": "This version is a clear-sky physics envelope. Weather, launch cost, a company, pretty 3D pictures, and lighting a site in the middle of the night are all real topics — they are just not this calculation.",
+      "decide": "Keep cost, weather-as-peak-I, eclipse on the pass, 3D, daytime geometry, and company evaluation out of this version. Peak I is a clear-sky envelope."
+    },
+    {
+      "id": "spec-snapshot",
+      "file": "spec.md",
+      "heading": "Snapshot",
+      "title": "Only one brightness geometry",
+      "recommend": "Keep kernel I at terminator-nadir only. The 30° elevation cut is for timing, not for dimming the quoted peak.",
+      "simple": "When we quote “how bright,” we always mean the satellite is overhead at dusk/dawn. The 30° cut is only “how long does the pass last,” not a dimmer switch on that brightness number.",
+      "decide": "The kernel reports I only at terminator-nadir. Elevation cut (30°) is for timing, not for dimming the quoted peak."
+    },
+    {
+      "id": "spec-image",
+      "file": "spec.md",
+      "heading": "Image",
+      "title": "Patch size",
+      "recommend": "Keep D = h × α with α the full solar angular diameter, the same for flat and focusing, computed in metres.",
+      "simple": "Hold a coin at arm’s length: it covers a certain angle. The Sun covers about half a degree. That angle, times the distance to the ground, is the width of the lit patch. A curved mirror cannot beat that floor.",
+      "decide": "Spot diameter is distance times the Sun’s full angular width. Flat and focusing share that minimum. Compute in metres."
+    },
+    {
+      "id": "spec-irradiance",
+      "file": "spec.md",
+      "heading": "Irradiance",
+      "title": "Brightness formula",
+      "recommend": "Keep I as collected sunlight spread over the solar image (not a lamp 1/r²). Pass η as one factor (1 or 0.675); do not stack ρ and τ on top.",
+      "simple": "The mirror intercepts some sunlight (area × solar constant × a cosine for the fold). That power is then spread over the huge solar image on the ground. That is why a modest mirror looks dim: not because space is far away like a lightbulb, but because the patch is enormous.",
+      "decide": "I is collected sunlight spread over the solar image — not inverse-square from a lamp. Efficiency is one factor (1 or 0.675), not stacked again."
+    },
+    {
+      "id": "spec-pass",
+      "file": "spec.md",
+      "heading": "Pass window",
+      "title": "How long a pass lasts",
+      "recommend": "Keep period on a = R_Earth + h. Useful time is geometric visibility above 30° on an overhead pass, with no umbra cut — an upper bound on duration.",
+      "simple": "Low Earth orbit is fast: on the order of 90 minutes around the world. The time the satellite stays high enough in your sky to be “useful” is only a few minutes. We do not yet subtract Earth’s shadow; so this duration is optimistic.",
+      "decide": "Orbit period uses Earth radius plus altitude. Useful time is geometric visibility above 30° on an overhead pass. Eclipse is not subtracted; this is an upper bound on duration."
+    },
+    {
+      "id": "spec-derived",
+      "file": "spec.md",
+      "heading": "Derived",
+      "title": "Energy per pass is an upper bound",
+      "recommend": "Keep fluence as I × T_useful, labeled upper bound. Keep required_area as a linear invert with no 1-sun clip in the kernel.",
+      "simple": "Energy per pass is roughly brightness times minutes. That product is a ceiling, not a precise light curve. “How big a mirror to hit a target brightness” is just running the brightness formula backwards.",
+      "decide": "Fluence is peak I times useful time, labeled upper bound because I is not constant on the window. required_area is a linear invert, not a 1-sun clip."
+    },
+    {
+      "id": "spec-deferred",
+      "file": "spec.md",
+      "heading": "Deferred",
+      "title": "Missing physics is not a finding",
+      "recommend": "Do not treat missing clouds, spectral atmosphere, umbra, wrinkles, or daytime fold as later results. They were left out on purpose.",
+      "simple": "If the final write-up says “this fails because we ignored clouds,” that would be cheating. Clouds were never in the model. The honest conclusion can only use what we actually computed.",
+      "decide": "Clouds, spectral atmosphere, umbra, wrinkles, and daytime fold stay out. Later assessment must not treat their absence as a result."
+    },
+    {
+      "id": "hand-625",
+      "file": "tests/hand_625.md",
+      "heading": "Hand sheet",
+      "title": "Checked example (625 km, 55 m)",
+      "recommend": "Accept 0.11 W/m² ideal (0.074 estimated) into a 5.8 km patch as the calibration point. If that scale feels wrong, stop before we draw or sweep the grid.",
+      "simple": "A 55-metre square mirror at 625 km is a check that the calculator matches hand arithmetic. 0.11 W/m² is a tiny fraction of daylight (~1000 W/m²) and much closer to moonlight-class (~0.003) than to a solar farm. If that feels unbelievable, we should stop and inspect the formula before making plots.",
+      "decide": "A 55 m square at 625 km delivers about 0.11 W/m² ideal (0.074 estimated) into a 5.8 km patch. Full sun is ~1000 W/m²; moonlight-class is ~0.003. If this scale feels wrong, stop before we draw or sweep the grid."
+    }
+  ]
+}

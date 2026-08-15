@@ -1,0 +1,27 @@
+{
+  "id": "my-project",
+  "title": "Drafting board",
+  "subtitle": "Load a file. Read typeset math. Agree or disagree with recommended actions.",
+  "packLabel": "Review key files",
+  "library": [
+    {
+      "group": "Start here",
+      "files": [
+        ["README.md", "Readme"],
+        ["notes.md", "Notes"]
+      ]
+    }
+  ],
+  "pack": [
+    ["README.md", "Readme"]
+  ],
+  "concepts": [],
+  "terms": [
+    {
+      "id": "example-term",
+      "aliases": ["example term"],
+      "def": "Optional project-specific hover terms. Built-in STEM terms already ship with the board.",
+      "wiki": "https://en.wikipedia.org/wiki/Main_Page"
+    }
+  ]
+}
