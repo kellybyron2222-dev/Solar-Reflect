@@ -41,7 +41,7 @@ def main() -> None:
         ax.axvline(hk, color=MUTED, lw=0.6, ls=":", zorder=0)
         ax.plot(hk, dk, "o", color=INK, ms=5, zorder=3)
         ax.annotate(
-            f"{hk:.0f} km\n{dk:.2f} km",
+            f"{hk:.0f} km\n{dk:.3f} km" if hk == 625 else f"{hk:.0f} km\n{dk:.2f} km",
             xy=(hk, dk),
             xytext=(8, 8 if hk < 1500 else -28),
             textcoords="offset points",

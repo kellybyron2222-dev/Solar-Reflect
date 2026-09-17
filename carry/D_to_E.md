@@ -5,16 +5,16 @@
 | Scene | File | 625 km check |
 |---|---|---|
 | S-geo-2d | `figures/final/s-geo-2d.svg` (locked) | \(D=5.812\,\mathrm{km}\) |
-| S-geo-2d-curved | `figures/working/s-geo-2d-curved.svg` | same \(D_{\min}\); \(f=h\), \(R=2f\) |
+| S-geo-2d-curved | `figures/working/s-geo-2d-curved.svg` | same \(D_{\min}\); \(f=h\), \(R=2f\); concave twin of the fold, not a new catalog ID |
 | S-spot-h | `figures/working/s-spot-h.svg` | \(D=5.812\,\mathrm{km}\) (rel \(0.0086\%\)) |
-| S-focus | `figures/working/s-focus.svg` | same \(D_{\min}\) |
+| S-focus | `figures/working/s-focus.svg` | \(D_{\min}=5.812\,\mathrm{km}\); over-bent illustration \(D=9.195\,\mathrm{km}\) at \(f=10\,\mathrm{km}\) (M55) |
 
 Scripts call `solar_image`. Stamp: terminator-nadir, \(\gamma=45^\circ\), \(\varepsilon=90^\circ\), \(D=d\alpha\), constants hash.
 
 ## E may start
 
 - **E1** now — \(D(h)\), \(A_\text{image}(h)\). Use S-geo-2d, S-spot-h, S-focus. Do not treat \(D\) as a design knob.
-- **E2–E5** after each prior mini look-back. Build S-I-A in E2, S-A-req in E3, S-dwell in E4.
+- **E2–E5** after each prior mini look-back. Build S-I-A in E2, S-A-req in E3, S-dwell in E4. Centre \(I\) is W/m² from the kernel (flat and \(f=h\) share it). lux is derived, not a kernel output; wait for E5 photometric readout.
 
 ## E must not treat as trusted from D
 

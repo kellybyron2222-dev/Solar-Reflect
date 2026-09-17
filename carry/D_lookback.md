@@ -2,8 +2,8 @@
 
 Re-read frozen intent. Artifacts: `figures/s_geo_2d.py`, `figures/s_spot_h.py`, `figures/s_focus.py`, `figures/working/`.
 
-1. **Intent.** Three 2D scripts. No GUI, no 3D, no extra catalog ID. Kernel+tests remain larger than D.
-2. **Plan.** No seventh scene. No \(I^*\) lines. S-I-A / S-A-req / S-dwell not built.
+1. **Intent.** Catalog 2D scripts plus the requested concave twin of S-geo-2d. No GUI, no 3D, no extra catalog ID. Kernel+tests remain larger than D.
+2. **Plan.** S-geo-2d-curved is the fold twin, not a seventh catalog scene. No \(I^*\) lines. S-I-A / S-A-req / S-dwell not built.
 3. **Honesty.** \(D(625\,\mathrm{km})=5.812\,\mathrm{km}\) on S-geo-2d and S-spot-h (rel \(0.0086\%\) vs hand sheet). GEO callout \(333\,\mathrm{km}\). Angle \(\alpha\) on S-geo-2d is enlarged and labeled.
 4. **Ready.** E1 can be written from S-geo-2d + S-spot-h + S-focus + C tables.
 

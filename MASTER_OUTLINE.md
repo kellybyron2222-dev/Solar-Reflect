@@ -23,7 +23,7 @@ This file is the plan spine. **Detailed working outlines for each phase** are in
 
 ## Frozen intent
 
-**Framed amendment (A freeze).** Default geometry is **terminator-nadir** (dusk/dawn footpoint, sunlit, \(\gamma=45^\circ\) collector incidence), not zenith over a deep-night dark target. Reason: nadir at local midnight is typically umbra (\(I=0\)); lighting a dark city is off-nadir and parked. Binders in v1 are **energy** (including solar-image dilution) or **shutter**; Ω (“spot too small”) is N/A for parked classes. Clouds as peak \(I\) are out (clear-sky envelope).
+**Framed amendment (v4).** Value geometry is **civil night**: sunlit terminator satellite, site with the Sun \(6^\circ\) below the horizon. Terminator-nadir remains the brighter envelope, not the application score. Local midnight nadir is typically umbra (\(I=0\)) and is not a lighting case. Binders are **energy** (including solar-image dilution) or **shutter**; Ω is N/A for parked classes. Clouds as peak \(I\) are out.
 
 **Primary.** For a reflector of collecting area \(A\) at altitude \(h\) with optical factor \(\eta\): what peak irradiance \(I\), ground-patch size \(D\), and dwell \(T\) can be delivered to Earth’s surface at that snapshot, and which physical fact binds (energy including solar-image dilution, or orbital shutter)?
 
@@ -31,7 +31,7 @@ This file is the plan spine. **Detailed working outlines for each phase** are in
 
 **Not the work.** Launch cost, markets, policy, spacecraft product design, photoreal rendering, constellation optimization, spectral weather models, clouds as peak \(I\), AI images of space mirrors.
 
-**Default geometry (declared here, not buried later).** Terminator-nadir snapshot: satellite over the terminator, nadir footpoint at dusk/dawn, \(\gamma = 45^\circ\) collector incidence, \(\varepsilon=90^\circ\), filled solar image, sunlit. Conservative vs daytime \(\gamma<45^\circ\); optimistic vs deeper-night \(\gamma>45^\circ\) and vs off-nadir dark-site lighting. Daytime fill-in is not v1.
+**Default geometry (declared here, not buried later).** Value snapshot: terminator-sunlit, civil-night site (\(\theta=6^\circ\)). Envelope snapshot: terminator-nadir, \(\gamma=45^\circ\), \(\varepsilon=90^\circ\). Daytime fill-in is not v1. True midnight is not v1.
 
 **Optical columns.** Ideal (\(\rho = \tau = 1\)) and one realistic (\(\rho\tau = 0.9 \times 0.75 = 0.675\)). No third “optimistic” column.
 
@@ -399,7 +399,7 @@ Summarize F under G with frozen figures. No physics decisions. No drawing decisi
 | v1 (this plan) | Later, only after a framed change |
 |---|---|
 | Kernel, tests, 2D, six scenes, results book, assessment, short report | 3D schematic, GUI explorer, \(I(\varepsilon)\) sweep, slope error, extra concept scenes |
-| Night zenith \(\gamma=45^\circ\) | Daytime geometry |
+| Civil-night closest approach (E6) | True midnight nadir; daytime \(\gamma\) |
 | Fluence as \(I \times T\) upper bound | Integrated light curve |
 | Markers 18 m, 55 m, 1 km | Architecture case study of a named system |
 
@@ -407,4 +407,35 @@ Summarize F under G with frozen figures. No physics decisions. No drawing decisi
 
 ## Next action
 
-Start **Phase A only.** Use [`phases/A_framing.md`](phases/A_framing.md). Write `framing.md`. Run Look-back A. Do not open `physics.py` until that loop passes.
+Report close-out: [`scope.md`](scope.md), freeze [`figures/report/`](figures/report/), draft [`report.md`](report.md). Analysis remains [`assessment.md`](assessment.md). Do not treat \(N\) as Earth coverage. Do not invent a midnight kernel. Do not add a v2 3D workbench unless a new framed intent says the assessment is incomplete without it.
+
+<!-- board-review -->
+## Board review
+
+Votes from the drafting board. Not freeze text until an iteration below is accepted.
+
+| Concept | Vote | Comment |
+|---|---|---|
+| Master plan — orbital sunlight on Earth | **agree** |  |
+| Frozen intent | **agree** |  |
+| Spine | **agree** |  |
+| Purpose | **agree** |  |
+| Outline | **agree** |  |
+| Look-back A | **agree** |  |
+| Look-back B | **agree** |  |
+| Look-back C | **agree** |  |
+| Deliverable | **agree** |  |
+| Look-back D | **agree** |  |
+| Look-back E (whole phase) | **agree** |  |
+| Look-back F | **agree** |  |
+| Look-back G | **agree** |  |
+| Look-back X | **agree** |  |
+| Look-back H (close) | **agree** |  |
+| v1 vs later (do not mix) | **agree** |  |
+| Next action | **agree** |  |
+
+<!-- iteration -->
+
+_No iteration written yet._
+<!-- /iteration -->
+<!-- /board-review -->

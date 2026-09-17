@@ -9,6 +9,276 @@
       "kind": "concept",
       "recommend": "Keep terminator-nadir (sunlit dusk/dawn footpoint) as the brightness envelope, because a mirror overhead at local midnight is usually in Earth’s shadow and has nothing to bounce. Dark-city lighting is a different, parked geometry. Treat 18 m / 55 m / 1 km as scale markers, not architectures. Keep the 400–2000 km grid; GEO is a size check only.",
       "updated": "2026-08-14 19:54"
+    },
+    "concept:framing-question": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:25",
+      "title": "The question",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Freeze the question as: how bright, how big, and how long is the ground patch at dusk/dawn looking straight down? Then: does energy or the orbital shutter bind first. Lighting/PV wait until those numbers exist."
+    },
+    "concept:framing-variables": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 20:56",
+      "title": "What we vary vs what we freeze",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Vary only altitude, area, and optical factor. Keep fold 45° and nadir 90° as a frozen snapshot. Do not let lighting or PV thresholds choose the model."
+    },
+    "concept:framing-glossary": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 20:59",
+      "title": "The Sun is a disk, not a lamp",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Treat the ground patch as the Sun’s image. Focusing cannot shrink it. Binders are energy (including that dilution) or shutter — not cost, not “spot too small.”"
+    },
+    "concept:framing-classes": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 20:59",
+      "title": "How we will score uses later",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Keep moonlight / lighting / weak PV / energy / daylight as parked estimated bins for a later readout. They must not choose area, altitude, or efficiency."
+    },
+    "concept:framing-scope": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:00",
+      "title": "What we are not modeling",
+      "file": "framing.md",
+      "kind": "concept",
+      "recommend": "Keep cost, clouds-as-peak-I, eclipse on the pass, 3D, daytime geometry, and company evaluation out of this version. Peak I stays a clear-sky envelope."
+    },
+    "concept:spec-snapshot": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:29",
+      "title": "Only one brightness geometry",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Keep kernel I at terminator-nadir only. The 30° elevation cut is for timing, not for dimming the quoted peak."
+    },
+    "concept:spec-image": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:30",
+      "title": "Patch size",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Keep D = h × α with α the full solar angular diameter, the same for flat and focusing, computed in metres."
+    },
+    "concept:spec-irradiance": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:33",
+      "title": "Brightness formula",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Keep I as collected sunlight spread over the solar image (not a lamp 1/r²). Pass η as one factor (1 or 0.675); do not stack ρ and τ on top."
+    },
+    "concept:spec-pass": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:36",
+      "title": "How long a pass lasts",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Keep period on a = R_Earth + h. Useful time is geometric visibility above 30° on an overhead pass, with no umbra cut — an upper bound on duration."
+    },
+    "concept:spec-derived": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:39",
+      "title": "Energy per pass is an upper bound",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Keep fluence as I × T_useful, labeled upper bound. Keep required_area as a linear invert with no 1-sun clip in the kernel."
+    },
+    "concept:spec-deferred": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 21:39",
+      "title": "Missing physics is not a finding",
+      "file": "spec.md",
+      "kind": "concept",
+      "recommend": "Do not treat missing clouds, spectral atmosphere, umbra, wrinkles, or daytime fold as later results. They were left out on purpose."
+    },
+    "concept:hand-625": {
+      "verdict": "disagree",
+      "note": "can we do a second calc at a more reasonable size, 9square meter",
+      "updated": "2026-08-14 22:03",
+      "title": "Checked example (625 km, 55 m)",
+      "file": "tests/hand_625.md",
+      "kind": "concept",
+      "recommend": "Accept 0.11 W/m² ideal (0.074 estimated) into a 5.8 km patch as the calibration point. If that scale feels wrong, stop before we draw or sweep the grid."
+    },
+    "concept:constants.yaml:constants": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 22:03",
+      "title": "Constants",
+      "file": "constants.yaml",
+      "kind": "concept",
+      "recommend": "Keep these constants as written."
+    },
+    "concept:MASTER_OUTLINE.md:lb3yoe": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:52",
+      "title": "Master plan — orbital sunlight on Earth",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:1tevmh1": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:53",
+      "title": "Frozen intent",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:xrncum": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:53",
+      "title": "Spine",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:3xs0yf": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:53",
+      "title": "Purpose",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:1qni61j": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Outline",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:sqcbqb": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back A",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:t0bxfa": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back B",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:tabj49": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back C",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:1b52wjc": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Deliverable",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:tkb4t8": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back D",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:1elrb98": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back E (whole phase)",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:u4ac76": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back F",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:ue9xw5": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back G",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:q8fwhk": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back X",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:rupwlj": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Look-back H (close)",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:b4721g": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "v1 vs later (do not mix)",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
+    },
+    "concept:MASTER_OUTLINE.md:wjtepw": {
+      "verdict": "agree",
+      "note": "",
+      "updated": "2026-08-14 23:54",
+      "title": "Next action",
+      "file": "MASTER_OUTLINE.md",
+      "kind": "concept",
+      "recommend": "Keep this section as written."
     }
   },
   "notes": {}

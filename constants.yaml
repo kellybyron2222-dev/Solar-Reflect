@@ -33,6 +33,11 @@ epsilon_min_deg:
   unit: deg
   source: "framing.md shutter only"
   class: scenario
+night_depression_deg:
+  value: 6.0
+  unit: deg
+  source: "Civil night: Sun 6° below horizon. Deepest useful night from a terminator-sunlit LEO sat is ~θ(ε_min), not local midnight."
+  class: scenario
 rho_ideal:
   value: 1.0
   unit: "1"

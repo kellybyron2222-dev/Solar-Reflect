@@ -12,11 +12,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from src.physics import (  # noqa: E402
+    fleet_count,
     fluence_envelope,
     irradiance,
+    irradiance_night,
     load_constants,
+    night_snapshot,
     pass_window,
+    pass_window_offtrack,
     required_area,
+    required_area_night,
     solar_image,
 )
 
@@ -36,6 +41,13 @@ HAND_I_18_IDEAL = 0.01175
 HAND_I_18_REAL = 0.007932
 HAND_I_55_IDEAL = 0.1097
 HAND_I_55_REAL = 0.07406
+HAND_T_625_MIN = 97.06
+HAND_T_HORIZON_625_MIN = 13.16
+HAND_T_USEFUL_625_MIN = 4.281
+HAND_T_HORIZON_1000_MIN = 17.61
+HAND_T_USEFUL_1000_MIN = 6.727
+HAND_I_55_NIGHT = 0.01642
+HAND_T_USEFUL_NIGHT_625_MIN = 2.809
 
 
 def test_T_D_identity():
@@ -102,6 +114,16 @@ def test_pass_window_horizon_identity():
     assert pw.T_useful_s < pw.T_horizon_s < pw.T_period_s
 
 
+def test_pass_window_vs_hand_sheet():
+    pw = pass_window(H_625)
+    assert pw.T_period_s / 60.0 == pytest.approx(HAND_T_625_MIN, rel=0.01)
+    assert pw.T_horizon_s / 60.0 == pytest.approx(HAND_T_HORIZON_625_MIN, rel=0.01)
+    assert pw.T_useful_s / 60.0 == pytest.approx(HAND_T_USEFUL_625_MIN, rel=0.01)
+    pw1000 = pass_window(1_000_000.0)
+    assert pw1000.T_horizon_s / 60.0 == pytest.approx(HAND_T_HORIZON_1000_MIN, rel=0.01)
+    assert pw1000.T_useful_s / 60.0 == pytest.approx(HAND_T_USEFUL_1000_MIN, rel=0.01)
+
+
 def test_period_400km_leo_band():
     T_min = pass_window(H_400).T_period_s / 60.0
     assert 90.0 <= T_min <= 95.0
@@ -117,3 +139,63 @@ def test_no_eta_stacking():
     I_eta = irradiance(A_55, H_625, ETA_REAL)
     I_id = irradiance(A_55, H_625, ETA_IDEAL)
     assert I_eta == pytest.approx(I_id * ETA_REAL, rel=1e-12)
+
+
+def test_night_zero_depression_is_nadir():
+    snap = night_snapshot(H_625, depression_rad=0.0)
+    img = solar_image(H_625)
+    assert snap.d_m == pytest.approx(H_625, rel=1e-12)
+    assert snap.D_minor_m == pytest.approx(img.D_m, rel=1e-12)
+    assert snap.A_image_m2 == pytest.approx(img.A_image_m2, rel=1e-9)
+    assert snap.cos_i == pytest.approx(math.sqrt(0.5), rel=1e-9)
+    assert irradiance_night(A_55, H_625, ETA_IDEAL, depression_rad=0.0) == pytest.approx(
+        irradiance(A_55, H_625, ETA_IDEAL), rel=1e-9
+    )
+
+
+def test_offtrack_zero_is_overhead():
+    pw = pass_window(H_625)
+    off = pass_window_offtrack(H_625, 0.0)
+    assert off.T_period_s == pytest.approx(pw.T_period_s, rel=1e-12)
+    assert off.T_horizon_s == pytest.approx(pw.T_horizon_s, rel=1e-12)
+    assert off.T_useful_s == pytest.approx(pw.T_useful_s, rel=1e-12)
+
+
+def test_night_625_vs_hand_sheet():
+    dep = math.radians(6.0)
+    assert irradiance_night(A_55, H_625, ETA_IDEAL, dep) == pytest.approx(
+        HAND_I_55_NIGHT, rel=0.01
+    )
+    assert pass_window_offtrack(H_625, dep).T_useful_s / 60.0 == pytest.approx(
+        HAND_T_USEFUL_NIGHT_625_MIN, rel=0.01
+    )
+
+
+def test_fleet_count_matches_e7_and_has_small_foil_min():
+    dep = math.radians(6.0)
+    n625 = fleet_count(0.1, 20 * 60, A_18, H_625, ETA_IDEAL, dep)
+    assert n625 == pytest.approx(404.8, rel=0.01)
+    n1500 = fleet_count(0.1, 20 * 60, A_18, 1_500_000.0, ETA_IDEAL, dep)
+    n2000 = fleet_count(0.1, 20 * 60, A_18, 2_000_000.0, ETA_IDEAL, dep)
+    assert n1500 < n625
+    assert n1500 < n2000
+    n_sized = fleet_count(0.1, 20 * 60, 1.842e4, H_625, ETA_IDEAL, dep)
+    assert n_sized == pytest.approx(7.120, rel=0.01)
+
+
+def test_fleet_product_is_two_ratios():
+    dep = math.radians(6.0)
+    I_one = irradiance_night(A_55, H_625, ETA_IDEAL, dep)
+    T_u = pass_window_offtrack(H_625, dep).T_useful_s / 60.0
+    n_I = 0.1 / I_one
+    n_T = 20.0 / T_u
+    assert n_I * n_T == pytest.approx(43.36, rel=0.01)
+    assert required_area_night(0.1, H_625, ETA_IDEAL, dep) / A_55 == pytest.approx(n_I, rel=1e-9)
+
+
+def test_night_graze_useful_is_zero():
+    a = C["R_earth"] + H_625
+    theta_u = math.acos((C["R_earth"] / a) * math.cos(math.radians(30.0))) - math.radians(30.0)
+    pw = pass_window_offtrack(H_625, theta_u)
+    assert pw.T_useful_s == pytest.approx(0.0, abs=1e-9)
+    assert pw.T_horizon_s > 0.0

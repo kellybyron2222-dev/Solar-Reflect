@@ -4,6 +4,7 @@ let PACK = [];
 let CONCEPTS = [];
 let NOTES_KEY = "drafting-board-notes:default";
 let ITEMS_KEY = "drafting-board-items:default";
+let COMMENTS_KEY = "drafting-board-comments:default";
 let PACK_LABEL = "Review key files";
 
 const KATEX_OPTS = {
@@ -193,6 +194,12 @@ const state = {
   qi: 0,
   pendingOnly: true,
   packMode: false,
+  comments: {},
+  pendingQuote: "",
+  pendingHeading: "",
+  pendingAt: null,
+  activeCommentId: "",
+  showDone: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -243,16 +250,645 @@ async function persistDecisionsToRepo() {
     const res = await fetch("/whiteboard/api/decision", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: itemDecisions(), notes: notesStore() }),
+      body: JSON.stringify({
+        items: itemDecisions(),
+        notes: notesStore(),
+        comments: commentsStore(),
+      }),
     });
     if (meta) {
       meta.textContent = res.ok
         ? "Saved to reviews/board-decisions.md and the note."
         : "Could not save votes into the repo.";
     }
+    return res.ok;
   } catch {
     if (meta) meta.textContent = "Could not save votes into the repo. Run python whiteboard/serve.py.";
+    return false;
   }
+}
+
+function commentsStore() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMENTS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveCommentsStore(obj) {
+  localStorage.setItem(COMMENTS_KEY, JSON.stringify(obj));
+  state.comments = obj;
+}
+
+function commentsForFile(name) {
+  const file = fileKey(name || state.current?.name || "");
+  return Object.values(state.comments).filter((c) => c && fileKey(c.file) === file);
+}
+
+function isDoneComment(c) {
+  return (c?.status || "open") === "resolved";
+}
+
+function openCommentsForFile(name) {
+  return commentsForFile(name).filter((c) => !isDoneComment(c));
+}
+
+function doneCommentsForFile(name) {
+  return commentsForFile(name)
+    .filter(isDoneComment)
+    .sort((a, b) => String(a.created || "").localeCompare(String(b.created || "")));
+}
+
+async function loadCommentsFromRepo() {
+  try {
+    const res = await fetch("/whiteboard/api/comments", { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.comments && typeof data.comments === "object") {
+      saveCommentsStore({ ...commentsStore(), ...data.comments });
+    }
+  } catch {
+    state.comments = commentsStore();
+  }
+}
+
+async function persistCommentToRepo(rec) {
+  const meta = $("comments-meta");
+  const body = rec ? { comment: rec, comments: commentsStore() } : { comments: commentsStore() };
+  try {
+    const res = await fetch("/whiteboard/api/comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      if (meta) meta.textContent = "Saved to reviews/draft-comments.md";
+      return true;
+    }
+  } catch {
+    /* fall through to the votes endpoint, which also writes comments */
+  }
+  const ok = await persistDecisionsToRepo();
+  if (meta) {
+    meta.textContent = ok
+      ? "Saved to reviews/draft-comments.md"
+      : "Could not save comments. Run python whiteboard/serve.py and hard-refresh.";
+  }
+  return ok;
+}
+
+async function deleteCommentFromRepo(id) {
+  const meta = $("comments-meta");
+  try {
+    const res = await fetch("/whiteboard/api/comment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ delete: id }),
+    });
+    if (meta) {
+      meta.textContent = res.ok
+        ? "Removed from reviews/draft-comments.md"
+        : "Could not update comments in the repo.";
+    }
+    return res.ok;
+  } catch {
+    if (meta) meta.textContent = "Could not save comments. Run python whiteboard/serve.py.";
+    return false;
+  }
+}
+
+function hideCommentPop() {
+  const pop = $("comment-pop");
+  if (pop) pop.hidden = true;
+  state.pendingQuote = "";
+  state.pendingHeading = "";
+  state.pendingAt = null;
+}
+
+function headingText(el) {
+  if (!el) return "";
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll(".draft-tag, .draft-ghosts").forEach((n) => n.remove());
+  return (clone.textContent || "").replace(/[✓✔]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function nearestHeading(node) {
+  let el = node && node.nodeType === 1 ? node : node?.parentElement;
+  const paper = $("paper");
+  while (el && el !== paper) {
+    let prev = el;
+    while (prev) {
+      if (/^H[1-4]$/.test(prev.tagName)) return headingText(prev);
+      prev = prev.previousElementSibling;
+    }
+    el = el.parentElement;
+  }
+  return "";
+}
+
+function snippet(s, n) {
+  const t = String(s || "").replace(/\s+/g, " ").trim();
+  if (t.length <= n) return t;
+  return t.slice(0, n - 1) + "…";
+}
+
+function cleanQuote(s) {
+  return String(s || "")
+    .replace(/[✓✔]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function collectQuoteNodes(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const p = node.parentElement;
+      if (!p || p.closest(".katex, .empty, script, .draft-tag, .draft-ghosts")) return NodeFilter.FILTER_REJECT;
+      if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  return nodes;
+}
+
+function rangeFromOffsets(nodes, start, end) {
+  let pos = 0;
+  let startNode;
+  let startOff;
+  let endNode;
+  let endOff;
+  for (const node of nodes) {
+    const len = node.nodeValue.length;
+    if (startNode == null && start < pos + len) {
+      startNode = node;
+      startOff = start - pos;
+    }
+    if (end <= pos + len) {
+      endNode = node;
+      endOff = end - pos;
+      break;
+    }
+    pos += len;
+  }
+  if (!startNode || !endNode) return null;
+  const range = document.createRange();
+  range.setStart(startNode, Math.max(0, startOff));
+  range.setEnd(endNode, Math.min(endNode.nodeValue.length, endOff));
+  return range;
+}
+
+function quoteOffsetFromPoint(root, container, offset) {
+  const nodes = collectQuoteNodes(root);
+  let pos = 0;
+  for (const node of nodes) {
+    if (node === container) return pos + Math.max(0, Math.min(offset, node.nodeValue.length));
+    pos += node.nodeValue.length;
+  }
+  if (container && container.nodeType === 1) {
+    pos = 0;
+    for (const node of nodes) {
+      if (container.contains(node)) return pos;
+      pos += node.nodeValue.length;
+    }
+  }
+  return 0;
+}
+
+function phraseRegex(phrase) {
+  const words = cleanQuote(phrase).split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const inner = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s+");
+  return new RegExp(`(?<![A-Za-z0-9])${inner}(?![A-Za-z0-9])`, "g");
+}
+
+function findPhraseRange(nodes, phrase, preferAt) {
+  const re = phraseRegex(phrase);
+  if (!re) return null;
+  const full = nodes.map((n) => n.nodeValue).join("");
+  let best = null;
+  let bestDist = Infinity;
+  let m;
+  while ((m = re.exec(full))) {
+    if (preferAt == null) {
+      return rangeFromOffsets(nodes, m.index, m.index + m[0].length);
+    }
+    const dist = Math.abs(m.index - preferAt);
+    if (dist < bestDist) {
+      best = m;
+      bestDist = dist;
+    }
+  }
+  if (!best) return null;
+  return rangeFromOffsets(nodes, best.index, best.index + best[0].length);
+}
+
+function findQuoteRange(root, quote, preferAt) {
+  const nodes = collectQuoteNodes(root);
+  const cleaned = cleanQuote(quote);
+  const exact = findPhraseRange(nodes, cleaned, preferAt);
+  if (exact) return exact;
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const minLen = words.length === 1 ? 1 : Math.min(4, words.length);
+  for (let len = words.length; len >= minLen; len--) {
+    for (let i = 0; i + len <= words.length; i++) {
+      const range = findPhraseRange(nodes, words.slice(i, i + len).join(" "), preferAt);
+      if (range) return range;
+    }
+  }
+  return null;
+}
+
+function wrapTextRange(range, id, extraClass) {
+  if (!range || range.collapsed) return null;
+  const ancestor = range.commonAncestorContainer;
+  const root = ancestor.nodeType === 1 ? ancestor : ancestor.parentElement;
+  if (!root) return null;
+  const nodes = [];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+      if (node.parentElement?.closest(".katex, .draft-tag, .draft-ghosts, .empty")) return NodeFilter.FILTER_REJECT;
+      return range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    },
+  });
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  let lastMark = null;
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const node = nodes[i];
+    let from = 0;
+    let to = node.nodeValue.length;
+    if (node === range.startContainer) from = range.startOffset;
+    if (node === range.endContainer) to = range.endOffset;
+    if (from > to) [from, to] = [to, from];
+    if (from === to) continue;
+    let piece = node;
+    if (to < piece.nodeValue.length) piece.splitText(to);
+    if (from > 0) piece = piece.splitText(from);
+    if (piece.parentElement?.closest(".draft-tag, .draft-ghosts, .katex")) continue;
+    const mark = document.createElement("mark");
+    mark.className = extraClass ? `draft-hl ${extraClass}` : "draft-hl";
+    mark.dataset.commentId = id;
+    piece.parentNode.insertBefore(mark, piece);
+    mark.appendChild(piece);
+    lastMark = mark;
+  }
+  return lastMark;
+}
+
+function wrapQuote(root, rec, extraClass) {
+  const range = findQuoteRange(root, rec.quote, rec.at);
+  if (!range) return false;
+  return !!wrapTextRange(range, rec.id, extraClass);
+}
+
+function findHeadingEl(root, heading) {
+  const want = cleanQuote(heading);
+  if (!want) return null;
+  const heads = [...root.querySelectorAll("h1, h2, h3, h4")];
+  const exact = heads.find((h) => headingText(h) === want);
+  if (exact) return exact;
+  return (
+    heads.find((h) => {
+      const t = headingText(h);
+      return t.includes(want) || want.includes(t);
+    }) || null
+  );
+}
+
+function makeCommentTag(rec, label, extraClass) {
+  const tag = document.createElement("button");
+  tag.type = "button";
+  tag.className = extraClass ? `draft-tag ${extraClass}` : "draft-tag";
+  tag.dataset.commentId = rec.id;
+  tag.textContent = label;
+  const where = rec.heading ? `Under “${snippet(rec.heading, 60)}”` : "";
+  tag.title = [isDoneComment(rec) ? "Done" : "Comment", `Originally: “${snippet(rec.quote, 90)}”`, rec.note, where]
+    .filter(Boolean)
+    .join("\n");
+  return tag;
+}
+
+function clearHighlights(paper) {
+  paper.querySelectorAll(".draft-tag, .draft-ghosts").forEach((el) => el.remove());
+  paper.querySelectorAll("mark.draft-hl").forEach((el) => {
+    const parent = el.parentNode;
+    if (!parent) return;
+    while (el.firstChild) parent.insertBefore(el.firstChild, el);
+    parent.removeChild(el);
+    parent.normalize();
+  });
+}
+
+function orderedComments() {
+  if (!state.current) return [];
+  const recs = openCommentsForFile(state.current.name);
+  const byId = Object.fromEntries(recs.map((r) => [r.id, r]));
+  const seen = [];
+  $("paper")
+    ?.querySelectorAll("mark.draft-hl:not(.done)")
+    .forEach((m) => {
+      const id = m.dataset.commentId;
+      if (id && byId[id] && !seen.includes(id)) seen.push(id);
+    });
+  return [...seen.map((id) => byId[id]), ...recs.filter((r) => !seen.includes(r.id))];
+}
+
+function placeCommentTags() {
+  const paper = $("paper");
+  if (!paper) return;
+  paper.querySelectorAll(".draft-tag, .draft-ghosts").forEach((el) => el.remove());
+  orderedComments().forEach((rec, i) => {
+    const marks = paper.querySelectorAll(`mark.draft-hl:not(.done)[data-comment-id="${rec.id}"]`);
+    const last = marks[marks.length - 1];
+    if (!last) return;
+    last.after(makeCommentTag(rec, String(i + 1)));
+  });
+  doneCommentsForFile(state.current?.name).forEach((rec) => {
+    const marks = paper.querySelectorAll(`mark.draft-hl.done[data-comment-id="${rec.id}"]`);
+    const last = marks[marks.length - 1];
+    if (!last) return;
+    last.after(makeCommentTag(rec, "✓", "done"));
+  });
+}
+
+function placeDoneGhosts() {
+  const paper = $("paper");
+  if (!paper || !state.current) return;
+  const grouped = new Map();
+  doneCommentsForFile(state.current.name).forEach((rec) => {
+    if (paper.querySelector(`mark.draft-hl[data-comment-id="${rec.id}"]`)) return;
+    const host = findHeadingEl(paper, rec.heading) || paper.querySelector("h1, h2, h3");
+    if (!host) return;
+    const list = grouped.get(host) || [];
+    list.push(rec);
+    grouped.set(host, list);
+  });
+  grouped.forEach((recs, host) => {
+    const wrap = document.createElement("span");
+    wrap.className = "draft-ghosts";
+    wrap.setAttribute("aria-label", "Completed comments that applied near this heading");
+    recs.forEach((rec) => wrap.appendChild(makeCommentTag(rec, "✓", "done ghost")));
+    host.insertAdjacentElement("afterend", wrap);
+  });
+}
+
+function applyCommentHighlights() {
+  const paper = $("paper");
+  if (!paper || !state.current || state.mode === "review") return;
+  clearHighlights(paper);
+  openCommentsForFile(state.current.name).forEach((rec) => wrapQuote(paper, rec));
+  doneCommentsForFile(state.current.name).forEach((rec) => wrapQuote(paper, rec, "done"));
+  placeCommentTags();
+  placeDoneGhosts();
+  if (state.activeCommentId) {
+    paper.querySelectorAll(`[data-comment-id="${state.activeCommentId}"]`).forEach((el) => el.classList.add("on"));
+  }
+}
+
+function commentLocationKind(id) {
+  const paper = $("paper");
+  if (paper?.querySelector(`mark.draft-hl[data-comment-id="${id}"]`)) return "quote";
+  if (paper?.querySelector(`.draft-tag[data-comment-id="${id}"]`)) return "heading";
+  return "none";
+}
+
+function commentCardHtml(rec, i, { done = false } = {}) {
+  const on = rec.id === state.activeCommentId ? "on" : "";
+  const loc = commentLocationKind(rec.id);
+  const locLabel =
+    loc === "quote"
+      ? rec.heading || ""
+      : loc === "heading"
+        ? `${rec.heading || "This section"} · wording moved`
+        : rec.heading || "";
+  const note =
+    !done || rec.id === state.activeCommentId
+      ? `<p class="note">${escapeHtml(rec.note || "")}</p>`
+      : "";
+  const actions = done
+    ? `<button type="button" class="act" data-reopen="${escapeHtml(rec.id)}">Reopen</button>
+       <button type="button" class="del" data-del="${escapeHtml(rec.id)}">Remove</button>`
+    : `<button type="button" class="act" data-done="${escapeHtml(rec.id)}">Done</button>
+       <button type="button" class="del" data-del="${escapeHtml(rec.id)}">Remove</button>`;
+  const num = done ? "✓" : String(i + 1);
+  return `<div class="comment-card ${done ? "done" : ""} ${on}" data-cid="${escapeHtml(rec.id)}">
+    <p class="quote"><span class="num${done ? " done" : ""}">${num}</span>${escapeHtml(snippet(rec.quote, 110))}</p>
+    ${note}
+    <div class="row">
+      <span class="quiet">${escapeHtml(locLabel)}</span>
+      <span class="card-actions">${actions}</span>
+    </div>
+  </div>`;
+}
+
+function bindCommentCards(root) {
+  root.querySelectorAll(".comment-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("[data-del], [data-done], [data-reopen]")) return;
+      focusComment(card.dataset.cid);
+    });
+  });
+  root.querySelectorAll("[data-del]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeComment(btn.dataset.del);
+    });
+  });
+  root.querySelectorAll("[data-done]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setCommentStatus(btn.dataset.done, "resolved");
+    });
+  });
+  root.querySelectorAll("[data-reopen]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setCommentStatus(btn.dataset.reopen, "open");
+    });
+  });
+}
+
+function paintComments() {
+  const list = $("comments-list");
+  const meta = $("comments-meta");
+  if (!list) return;
+  if (!state.current) {
+    list.innerHTML = "";
+    if (meta) meta.textContent = "Select a passage in the article to comment.";
+    return;
+  }
+  const recs = orderedComments();
+  const done = doneCommentsForFile(state.current.name);
+  if (!recs.length && !done.length) {
+    list.innerHTML = `<p class="quiet">None yet. Highlight text in the article.</p>`;
+    if (meta) meta.textContent = "Select a passage in the article to comment.";
+    return;
+  }
+  const openBit = recs.length ? `${recs.length} open` : "0 open";
+  const doneBit = done.length ? `${done.length} done` : "";
+  if (meta) {
+    meta.textContent = [openBit, doneBit, "saved to reviews/draft-comments.md"].filter(Boolean).join(" · ");
+  }
+  const openHtml = recs.length
+    ? recs.map((rec, i) => commentCardHtml(rec, i)).join("")
+    : `<p class="quiet">No open comments. Highlight text to add one.</p>`;
+  const doneOpen = state.showDone || (state.activeCommentId && done.some((c) => c.id === state.activeCommentId));
+  const doneHtml = done.length
+    ? `<details class="done-block" ${doneOpen ? "open" : ""}>
+        <summary>Done · ${done.length}</summary>
+        ${done.map((rec, i) => commentCardHtml(rec, i, { done: true })).join("")}
+      </details>`
+    : "";
+  list.innerHTML = openHtml + doneHtml;
+  const details = list.querySelector(".done-block");
+  details?.addEventListener("toggle", () => {
+    state.showDone = details.open;
+  });
+  bindCommentCards(list);
+}
+
+function focusComment(id) {
+  const rec = state.comments[id];
+  if (rec && isDoneComment(rec)) state.showDone = true;
+  state.activeCommentId = id;
+  paintComments();
+  const paper = $("paper");
+  paper?.querySelectorAll("mark.draft-hl, .draft-tag").forEach((el) => {
+    el.classList.toggle("on", el.dataset.commentId === id);
+  });
+  const mark = paper?.querySelector(`mark.draft-hl[data-comment-id="${id}"]`);
+  const tag = paper?.querySelector(`.draft-tag[data-comment-id="${id}"]`);
+  (mark || tag)?.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+}
+
+async function setCommentStatus(id, status) {
+  const all = { ...state.comments };
+  const rec = all[id];
+  if (!rec) return;
+  rec.status = status;
+  if (status === "resolved") rec.resolvedAt = stamp();
+  else delete rec.resolvedAt;
+  saveCommentsStore(all);
+  if (status === "resolved") state.showDone = true;
+  await persistCommentToRepo(rec);
+  applyCommentHighlights();
+  paintComments();
+}
+
+async function removeComment(id) {
+  const all = { ...state.comments };
+  delete all[id];
+  saveCommentsStore(all);
+  if (state.activeCommentId === id) state.activeCommentId = "";
+  await deleteCommentFromRepo(id);
+  applyCommentHighlights();
+  paintComments();
+}
+
+function placeCommentPop(range) {
+  const pop = $("comment-pop");
+  if (!pop) return;
+  const rects = range.getClientRects();
+  const rect = rects[rects.length - 1] || range.getBoundingClientRect();
+  pop.hidden = false;
+  const w = pop.offsetWidth || 360;
+  const h = pop.offsetHeight || 220;
+  let left = rect.left;
+  let top = rect.bottom + 8;
+  if (left + w > window.innerWidth - 12) left = window.innerWidth - w - 12;
+  if (left < 12) left = 12;
+  if (top + h > window.innerHeight - 12) top = Math.max(12, rect.top - h - 8);
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+}
+
+function openCommentComposer() {
+  if (state.mode === "review" || !state.current) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const paper = $("paper");
+  if (!paper || !paper.contains(range.commonAncestorContainer)) return;
+  const quote = cleanQuote(sel.toString());
+  if (quote.length < 2) return;
+  state.pendingQuote = quote;
+  state.pendingHeading = nearestHeading(range.startContainer);
+  state.pendingAt = quoteOffsetFromPoint(paper, range.startContainer, range.startOffset);
+  $("comment-quote").textContent = snippet(quote, 280);
+  $("comment-body").value = "";
+  const popMeta = $("comment-pop-meta");
+  if (popMeta) popMeta.textContent = state.pendingHeading || "";
+  placeCommentPop(range);
+  $("comment-body")?.focus();
+}
+
+async function saveCommentFromPop() {
+  const note = ($("comment-body")?.value || "").trim();
+  const quote = state.pendingQuote;
+  if (!quote || !state.current) return;
+  if (!note) {
+    $("comment-body")?.focus();
+    return;
+  }
+  const rec = {
+    id: hashId([state.current.name, quote, stamp(), String(Math.random())]),
+    file: fileKey(state.current.name),
+    quote,
+    heading: state.pendingHeading,
+    at: state.pendingAt,
+    note,
+    created: stamp(),
+    status: "open",
+  };
+  const all = { ...state.comments, [rec.id]: rec };
+  saveCommentsStore(all);
+  await persistCommentToRepo(rec);
+  hideCommentPop();
+  window.getSelection()?.removeAllRanges();
+  state.activeCommentId = rec.id;
+  if (state.current) showFile(state.current);
+  else {
+    applyCommentHighlights();
+    paintComments();
+  }
+}
+
+function bindCommentUi() {
+  const drop = $("drop");
+  drop?.addEventListener("mouseup", (e) => {
+    if (state.mode === "review") return;
+    if (e.target.closest?.("#comment-pop, #term-pop, textarea, input, button, mark.draft-hl, .draft-tag, .draft-ghosts")) return;
+    window.setTimeout(openCommentComposer, 0);
+  });
+  $("comment-save")?.addEventListener("click", () => saveCommentFromPop());
+  $("comment-cancel")?.addEventListener("click", hideCommentPop);
+  $("comment-body")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      saveCommentFromPop();
+    }
+    if (e.key === "Escape") hideCommentPop();
+  });
+  document.addEventListener("mousedown", (e) => {
+    const pop = $("comment-pop");
+    if (!pop || pop.hidden) return;
+    if (pop.contains(e.target)) return;
+    if ($("paper")?.contains(e.target) && window.getSelection() && !window.getSelection().isCollapsed) return;
+    hideCommentPop();
+  });
+  $("paper")?.addEventListener("click", (e) => {
+    const hit = e.target.closest?.("mark.draft-hl, .draft-tag");
+    if (!hit) return;
+    e.preventDefault();
+    focusComment(hit.dataset.commentId);
+  });
 }
 
 function hashId(parts) {
@@ -278,12 +914,46 @@ function protectFences(md, fn) {
   return fn(masked).replace(/\0FENCE(\d+)\0/g, (_, n) => fences[Number(n)]);
 }
 
+function protectImages(md, fn) {
+  const imgs = [];
+  const masked = md.replace(/!\[[^\]]*\]\([^)]+\)/g, (m) => {
+    imgs.push(m);
+    return `\0IMG${imgs.length - 1}\0`;
+  });
+  return fn(masked).replace(/\0IMG(\d+)\0/g, (_, n) => imgs[Number(n)]);
+}
+
 function latexToDollar(md) {
-  return protectFences(md, (s) =>
-    s
-      .replace(/\\\[([\s\S]*?)\\\]/g, (_, body) => `\n\n$$\n${body.trim()}\n$$\n\n`)
-      .replace(/\\\(([\s\S]*?)\\\)/g, (_, body) => `$${body}$`)
+  return protectImages(md, (s) =>
+    protectFences(s, (t) =>
+      t
+        .replace(/\\\[([\s\S]*?)\\\]/g, (_, body) => `\n\n$$\n${body.trim()}\n$$\n\n`)
+        .replace(/\\\(([\s\S]*?)\\\)/g, (_, body) => `$${body}$`)
+    )
   );
+}
+
+function repoAssetUrl(src) {
+  if (/^(https?:|data:|\/|#)/i.test(src)) return src;
+  const rel = src.replace(/^\.\//, "").replace(/^\/+/, "");
+  return "/" + rel.split("/").map(encodeURIComponent).join("/");
+}
+
+function renderMarkdown(md) {
+  const prepared = latexToDollar(md);
+  const math = [];
+  const masked = prepared.replace(/\$\$[\s\S]+?\$\$|\$[^$]+\$/g, (m) => {
+    math.push(m);
+    return `@@MATH${math.length - 1}@@`;
+  });
+  let html = marked.parse(masked, { gfm: true, breaks: false });
+  html = html.replace(/@@MATH(\d+)@@/g, (_, n) => math[Number(n)]);
+  html = html.replace(/<img([^>]*?)src="([^"]+)"([^>]*)>/g, (_, pre, src, post) => {
+    const url = repoAssetUrl(src);
+    return `<img${pre}src="${url}"${post}>`;
+  });
+  html = html.replace(/<p>(<img\b[\s\S]*?>)<\/p>/g, `<figure class="board-fig">$1</figure>`);
+  return html;
 }
 
 function extractDisplayMath(md) {
@@ -345,6 +1015,7 @@ function bindTermPop() {
   document.body.addEventListener("mouseover", (e) => {
     const el = e.target.closest?.(".term");
     if (!el || !el.dataset.term) return;
+    if (window.getSelection() && !window.getSelection().isCollapsed) return;
     const t = TERM_BY_ID[el.dataset.term];
     if (!t) return;
     clearTimeout(termHideTimer);
@@ -373,6 +1044,7 @@ function bindTermPop() {
   document.body.addEventListener("mouseout", (e) => {
     const el = e.target.closest?.(".term");
     if (!el) return;
+    if (window.getSelection() && !window.getSelection().isCollapsed) return;
     const to = e.relatedTarget;
     if (to && (pop.contains(to) || to.closest?.(".term"))) return;
     termHideTimer = setTimeout(() => {
@@ -383,18 +1055,6 @@ function bindTermPop() {
   pop.addEventListener("mouseleave", () => {
     pop.hidden = true;
   });
-}
-
-function renderMarkdown(md) {
-  const prepared = latexToDollar(md);
-  const math = [];
-  const masked = prepared.replace(/\$\$[\s\S]+?\$\$|\$[^$]+\$/g, (m) => {
-    math.push(m);
-    return `@@MATH${math.length - 1}@@`;
-  });
-  let html = marked.parse(masked, { gfm: true, breaks: false });
-  html = html.replace(/@@MATH(\d+)@@/g, (_, n) => math[Number(n)]);
-  return html;
 }
 
 function splitSections(md) {
@@ -695,6 +1355,7 @@ function setReviewChrome(on) {
   $("rail-read").classList.toggle("hidden", on);
   $("rail-review").classList.toggle("hidden", !on);
   $("list-heading").textContent = on ? "Concepts" : "On this page";
+  if (on) hideCommentPop();
 }
 
 function renderReview() {
@@ -888,6 +1549,8 @@ function showFile(rec) {
   });
   setFormulaRail(rec.text);
   loadReview(rec.name);
+  applyCommentHighlights();
+  paintComments();
   paintLibrary();
   paintOpened();
 }
@@ -901,7 +1564,8 @@ function remember(name, text) {
 
 async function fetchRepoFile(path) {
   const url = new URL("../" + path, window.location.href);
-  const res = await fetch(url);
+  url.searchParams.set("v", String(Date.now()));
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`${res.status} ${path}`);
   return res.text();
 }
@@ -970,7 +1634,15 @@ function paintOpened() {
     })
     .join("");
   $("opened").querySelectorAll("button[data-open]").forEach((btn) => {
-    btn.addEventListener("click", () => showFile(state.opened.get(btn.dataset.open)));
+    btn.addEventListener("click", async () => {
+      const path = btn.dataset.open;
+      try {
+        const text = await fetchRepoFile(path);
+        remember(path, text);
+      } catch {
+        showFile(state.opened.get(path));
+      }
+    });
   });
 }
 
@@ -1066,6 +1738,18 @@ $("btn-export").addEventListener("click", () => {
     if (!rec.notes && !rec.status) continue;
     md.push(`## File notes — ${file}`, "", `- Status: ${rec.status || "—"}`, "", rec.notes || "", "");
   }
+  const byCommentFile = {};
+  for (const rec of Object.values(state.comments)) {
+    if (!rec?.file) continue;
+    (byCommentFile[rec.file] ||= []).push(rec);
+  }
+  for (const [file, recs] of Object.entries(byCommentFile)) {
+    md.push(`## Inline comments — ${file}`, "");
+    for (const rec of recs) {
+      const done = (rec.status || "open") === "resolved" ? "done · " : "";
+      md.push(`> ${String(rec.quote || "").replace(/\n/g, " ")}`, "", `${done}${rec.note || ""}`, "");
+    }
+  }
   const blob = new Blob([md.join("\n")], { type: "text/markdown" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -1075,7 +1759,18 @@ $("btn-export").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (state.mode !== "review") return;
+  if (e.key === "Escape") hideCommentPop();
+  if (state.mode !== "review") {
+    if (e.key === "c" || e.key === "C") {
+      const tag = (e.target && e.target.tagName) || "";
+      if (tag === "TEXTAREA" || tag === "INPUT") return;
+      if (window.getSelection() && !window.getSelection().isCollapsed) {
+        e.preventDefault();
+        openCommentComposer();
+      }
+    }
+    return;
+  }
   const tag = (e.target && e.target.tagName) || "";
   if (tag === "TEXTAREA" || tag === "INPUT") return;
   if (e.key === "a" || e.key === "A") {
@@ -1118,9 +1813,11 @@ async function applyConfig(cfg) {
   if (id === "solar-reflect") {
     NOTES_KEY = "solar-reflect-board-notes-v1";
     ITEMS_KEY = "solar-reflect-board-items-v3";
+    COMMENTS_KEY = "solar-reflect-board-comments-v1";
   } else {
     NOTES_KEY = `drafting-board-notes:${id}`;
     ITEMS_KEY = `drafting-board-items:${id}`;
+    COMMENTS_KEY = `drafting-board-comments:${id}`;
   }
   if (Array.isArray(cfg.library)) LIBRARY = cfg.library;
   if (Array.isArray(cfg.pack)) PACK = cfg.pack;
@@ -1165,10 +1862,16 @@ async function loadConfig() {
 async function boot() {
   await loadConfig();
   await loadDecisionsFromRepo();
+  await loadCommentsFromRepo();
+  state.comments = { ...commentsStore(), ...state.comments };
+  saveCommentsStore(state.comments);
+  if (Object.keys(state.comments).length) await persistCommentToRepo(null);
   paintLibrary();
   paintOpened();
+  paintComments();
   probeServer();
   bindTermPop();
+  bindCommentUi();
 }
 
 boot();

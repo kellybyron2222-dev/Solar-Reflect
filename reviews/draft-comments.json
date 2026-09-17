@@ -1,0 +1,142 @@
+{
+  "comments": {
+    "6pmmxq": {
+      "id": "6pmmxq",
+      "file": "report.md",
+      "quote": "Three conclusions Orbital mirrors project an image of the Sun, not a spotlight. Brightness is mostly an area problem. Duration is mostly a dwell-time problem.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "This is too abrupt. We go from talking about flashlights and light bulbs to the conclusion of the article without any context. we need more of an intro and scene set before concluding",
+      "created": "2026-08-18 23:29",
+      "status": "open"
+    },
+    "4u0l33": {
+      "id": "4u0l33",
+      "file": "report.md",
+      "quote": "foil",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "can we use a different word here that is more relatable and define foil later in the text",
+      "created": "2026-08-18 23:38",
+      "status": "open"
+    },
+    "1cogazf": {
+      "id": "1cogazf",
+      "file": "report.md",
+      "quote": "vehicles",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "say something like and how many of them (in refernee to foil which, see prior comment on different word)",
+      "created": "2026-08-18 23:39",
+      "status": "open"
+    },
+    "3ahfqk": {
+      "id": "3ahfqk",
+      "file": "report.md",
+      "quote": "and which physical fact binds first",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "use more natural language - people dont say binds",
+      "created": "2026-08-18 23:39",
+      "status": "open"
+    },
+    "168h9nx": {
+      "id": "168h9nx",
+      "file": "report.md",
+      "quote": "ighting and photovoltaic thresholds sit at the end, as a readout. They do not choose the physics.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "this sounds like AI garbled speak, reword to natural plain english",
+      "created": "2026-08-18 23:40",
+      "status": "open"
+    },
+    "oya63b": {
+      "id": "oya63b",
+      "file": "report.md",
+      "quote": "The next sections stay with the picture a reasonable person would hold. Then they take, in order, the five repairs that picture suggests once it starts to crack.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "this is awakward. be more smooth and natural and conversational when providing the overview framework for the article to follow",
+      "created": "2026-08-18 23:40",
+      "status": "open"
+    },
+    "1l07kpv": {
+      "id": "1l07kpv",
+      "file": "report.md",
+      "quote": "farm",
+      "heading": "Delivering reflected sunlight to a dark site✓✓✓✓",
+      "note": "change to something like use to generate electricity or maybe more general use for some purpose - consider other alternatives as well",
+      "created": "2026-08-31 11:06",
+      "status": "open"
+    },
+    "186nq40": {
+      "id": "186nq40",
+      "file": "report.md",
+      "quote": "his note is a physics thought experiment about that claim.",
+      "heading": "Delivering reflected sunlight to a dark site✓✓✓✓",
+      "note": "change to \nThis note is a physics thought experiment about using mirrors in space to reflect sunlight onto locations on Earth",
+      "created": "2026-08-31 11:10",
+      "status": "resolved",
+      "resolvedAt": "2026-08-31 13:07"
+    },
+    "1lm165e": {
+      "id": "1lm165e",
+      "file": "report.md",
+      "quote": "Not a company review, and not a plan to build one. The artist’s impression is larger than the question I actually want to answer. Take a mirror of some size, flying at some height, with some allowance for losses in the reflection and in the air. How bright is the patch on the ground? How wide is it? How long does it last at a site that is already dark — Sun six degrees below the horizon? And which of those hits a wall first?",
+      "heading": "Delivering reflected sunlight to a dark site✓✓✓✓",
+      "note": "change to \n\nIt is not an evaluation of any company, proposal, or real-world project, and it does not assume that such a system should or could be built. Suppose a mirror of a given size is placed in orbit at a certain altitude, with realistic allowances for reflection losses, pointing accuracy, atmospheric effects, and the changing position of the Sun. How much sunlight could be redirected to a chosen location on Earth, over what area would it be spread, and how bright would the reflected light appear at the surface?",
+      "created": "2026-08-31 11:11",
+      "status": "resolved",
+      "resolvedAt": "2026-08-31 13:07"
+    },
+    "1fiebpv": {
+      "id": "1fiebpv",
+      "file": "report.md",
+      "quote": "The picture in full: a giant flashlight in space. A reflective sheet unfolds above Earth, points at a city, and shines a bright spot wherever we want light. It sounds plausible because mirrors do redirect sunlight, and orbit is above the night. Dawn and dusk put the Sun on the horizon while cities below are already going dark. Tilt a sheet, fold that light down, paint the streets. A 55-metre sheet of reflector — a foil✓, from here on — is the size of a building. A building-sized lamp, hung 625 km up, ought to do something dramatic. Hold that picture. The rest of this note has to earn the right to replace it.",
+      "heading": "The flashlight picture",
+      "note": "The intuitive picture is simple: a giant flashlight in space.\n\nImagine a 55-square-metre mirror unfolding in orbit above Earth. The mirror points at a city and redirects sunlight to create a bright spot wherever light is wanted. At first glance, the idea seems plausible. Mirrors can reflect sunlight, and an object in orbit may still be illuminated by the Sun while the ground below is in darkness.\n\nThat mental model is powerful because it feels familiar. We already know that mirrors can throw bright patches of light across a room, across a field, or even across long distances. Why not scale the same idea up and do it from space?\n\nThe question is how closely the underlying physics matches the simple picture that first comes to mind. To find out, we have to treat the concept as a real optical system governed by geometry, diffraction, orbital mechanics, and energy conservation. The flashlight analogy is a useful starting point, but it captures only part of the story.",
+      "created": "2026-08-31 11:21",
+      "status": "resolved",
+      "resolvedAt": "2026-08-31 13:13"
+    },
+    "1a7hryb": {
+      "id": "1a7hryb",
+      "file": "report.md",
+      "quote": "Imagine somebody actually claims they can do this.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "this is a bit rude to someone who does in fact claim they can do this. can we make it more polite",
+      "created": "2026-08-31 12:48",
+      "status": "open"
+    },
+    "1q9aqbh": {
+      "id": "1q9aqbh",
+      "file": "report.md",
+      "quote": "and fold that",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "and reflect that",
+      "created": "2026-08-31 13:04",
+      "status": "open"
+    },
+    "17x6727": {
+      "id": "17x6727",
+      "file": "report.md",
+      "quote": "People have proposed this as a real option. It deserves a straight look.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "The idea seems straightforward enough.",
+      "created": "2026-08-31 13:06",
+      "status": "open"
+    },
+    "n136g7": {
+      "id": "n136g7",
+      "file": "report.md",
+      "quote": "Street lights and solar panels enter the discussion later, as benchmarks against familiar technologies. They are useful for judging the scale of the numbers, but they do not change the underlying physics.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "The goal is not simply to calculate how much light reaches the ground. The goal is to determine whether that light is useful. To answer that, we'll compare it with familiar benchmarks such as moonlight, street lighting, and the sunlight required to generate meaningful amounts of electricity.",
+      "created": "2026-08-31 13:11",
+      "status": "open"
+    },
+    "6nv6ad": {
+      "id": "6nv6ad",
+      "file": "report.md",
+      "quote": "I’ll start with the basic picture, then work through the most common objections or corrections that arise when that picture begins to break down.",
+      "heading": "Delivering reflected sunlight to a dark site",
+      "note": "Let's start with the simplest version of the idea and see how it changes as more of the physics is added back in.",
+      "created": "2026-08-31 13:12",
+      "status": "open"
+    }
+  }
+}

@@ -5,6 +5,14 @@
   "packLabel": "Review framework",
   "library": [
     {
+      "group": "Report",
+      "files": [
+        ["report.md", "Report — delivering reflected sunlight"],
+        ["scope.md", "Report scope"],
+        ["assessment.md", "Assessment (night map)"]
+      ]
+    },
+    {
       "group": "Framework (start here)",
       "files": [
         ["framing.md", "Framing — the question"],
@@ -26,9 +34,35 @@
       ]
     },
     {
+      "group": "Results",
+      "files": [
+        ["results/e1.md", "E1 — Geometry (D and A_image)"],
+        ["results/e2.md", "E2 — Peak irradiance"],
+        ["results/e3.md", "E3 — Required area"],
+        ["results/e6.md", "E6 — Night-value snapshot"],
+        ["results/e7.md", "E7 — Satellites for useful light"],
+        ["results/e8.md", "E8 — Optimal satellite count"],
+        ["assessment.md", "Assessment (night map)"]
+      ]
+    },
+    {
+      "group": "Reviews",
+      "files": [
+        ["reviews/review-1000-triage.md", "1000-persona triage"],
+        ["reviews/literature-vs-kernel.md", "Literature vs kernel"],
+        ["reviews/draft-comments.md", "Draft comments (inline)"]
+      ]
+    },
+    {
       "group": "Final figures",
       "files": [
         ["figures/final/s-geo-2d.svg", "S-geo-2d — locked (flat foil)"]
+      ]
+    },
+    {
+      "group": "Explorer",
+      "files": [
+        ["figures/explorer/index.html", "Civil-night 3D cases (E6–E8)"]
       ]
     },
     {
@@ -37,7 +71,10 @@
         ["figures/working/s-geo-2d.svg", "S-geo-2d — Sun is a disk"],
         ["figures/working/s-geo-2d-curved.svg", "S-geo-2d-curved — concave foil"],
         ["figures/working/s-spot-h.svg", "S-spot-h — D vs altitude"],
-        ["figures/working/s-focus.svg", "S-focus — focusing does not shrink D"]
+        ["figures/working/s-focus.svg", "S-focus — Dmin at f=h; extra curve opens D"],
+        ["figures/working/s-i-a.svg", "S-I-A — I vs A and h"],
+        ["figures/working/s-i-two.svg", "S-i-two — two areas, same patch, I ∝ A"],
+        ["figures/working/s-a-req.svg", "S-A-req — A required vs h for parked I*"]
       ]
     }
   ],

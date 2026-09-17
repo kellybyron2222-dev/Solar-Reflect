@@ -23,7 +23,9 @@ python whiteboard/serve.py
 
 Without a config file, the board still works: **Open files** / drag-and-drop, then **Review** on whatever you loaded.
 
-**Agree / Disagree** writes into the project (not only the browser): `reviews/board-decisions.md` and a **Board review** section at the bottom of the markdown you voted on. That is what the next review pass reads. File:// mode cannot save; use `python whiteboard/serve.py`.
+**Agree / Disagree** writes into the project (not only the browser): `reviews/board-decisions.md` and a **Board review** section at the bottom of the markdown you voted on. That is what the next review pass reads.
+
+**Highlight and comment** (Read or Logic mode): select a passage in the article, type a note, Save. Comments write `reviews/draft-comments.md` and `reviews/draft-comments.json`. Mark a comment **Done** after it is addressed — it stays collapsed in the rail, with a pin on the original wording or on the section heading if that wording moved. File:// mode cannot save; use `python whiteboard/serve.py`.
 
 ## Files to copy
 

@@ -1,0 +1,24 @@
+Report freeze (Phase X)
+Date: 2026-08-18
+Git HEAD (short): f26d876
+constants.yaml sha256[:8]: 8daae9e1
+E0 = 1361 W/m^2
+alpha_rad = 0.0093 (full solar angular diameter)
+rho_real = 0.9 (estimated)
+tau_real = 0.75 (estimated; zenith clear-sky direct beam)
+eta_real = 0.675
+R_earth = 6371000 m
+gamma_deg = 45
+epsilon_min_deg = 30
+night_depression_deg = 6
+
+Manifest (G):
+  s-geo-2d.svg/.png
+  s-focus.svg/.png
+  s-spot-h.svg/.png
+  s-i-a.svg/.png
+  s-dwell.svg/.png
+
+Source: copy of figures/working/ (same scripts as D/E). No new geometry.
+Spot-check: solar_image(625 km).D_m/1000 = 5.8125 km; hand sheet 5.812 km; rel < 1%.
+Regenerate working copies: python figures/s_geo_2d.py (etc.) then recopy.

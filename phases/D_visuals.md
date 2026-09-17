@@ -59,8 +59,8 @@ Typical C→D impacts:
 
 **S-focus — étendue concept (2D)**
 
-- Dual panel: (left) flat mirror, cone of angle \(\alpha\), patch \(D\); (right) concave with \(f=d\), image of the solar disk still \(D\); caption that \(f<d\) focuses early then diverges.
-- No ray-tracing theater. Three rays from two solar-limb points are enough.
+- Three panels: (left) flat, kernel \(D=h\alpha\); (middle) concave \(f=h\), \(D_{\min}=h\alpha\); (right) \(f<h\), focus early then the cone opens, \(D>D_{\min}\).
+- No ray-tracing theater. Two solar-limb edges are enough. Do not draw the hemispherical \(D_{\max}\) to scale.
 
 **S-I-A — energy scaling** (may wait until E2)
 
@@ -95,9 +95,9 @@ Shared helper allowed: `figures/_style.py` for fonts, line weights, stamp functi
 
 Must exist and match kernel at 625 km:
 
-- [ ] S-geo-2d
-- [ ] S-spot-h
-- [ ] S-focus (strongly preferred with E1; if time-split, E1 mini look-back must still include the focusing argument in prose)
+- [x] S-geo-2d
+- [x] S-spot-h
+- [x] S-focus (strongly preferred with E1; if time-split, E1 mini look-back must still include the focusing argument in prose)
 
 S-I-A, S-A-req, S-dwell are **campaign-owned**. Do not block E1 on them.
 

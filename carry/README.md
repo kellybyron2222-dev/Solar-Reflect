@@ -10,9 +10,11 @@ Template and rules: `phases/CARRY.md`
 | A | `carry/B_scoped.md` | B (this phase) |
 | B | `carry/B_to_C.md` | C0 |
 | C | `carry/C_to_D.md` | D0 |
-| C | `carry/C_to_D.md` | D0 |
 | D | `carry/D_to_E.md` | E0 |
-| E1–E4 | `carry/E1_to_E2.md` … | next campaign |
+| E | `carry/E_scoped.md` | E (this phase) |
+| E1 | `carry/E1_to_E2.md` | E2 |
+| E2 | `carry/E2_to_E3.md` | E3 |
+| E3 | `carry/E3_to_E4.md` | E4 |
 | E | `carry/E_to_F.md` | F0 |
 | F | `carry/F_to_G.md` | G0 |
 | G | `carry/G_to_X.md` | X0 |

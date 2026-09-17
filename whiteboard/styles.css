@@ -139,12 +139,24 @@ body {
 .drop.over { outline: 2px dashed var(--accent); outline-offset: -8px; }
 
 .paper {
-  max-width: 46rem;
+  max-width: 52rem;
   margin: 0 auto;
   background: var(--sheet);
   padding: 2rem 2.25rem 3rem;
   box-shadow: 0 0 0 1px var(--rule);
-  font: 18px/1.55 var(--serif);
+  font: 18px/1.62 var(--serif);
+}
+.paper p { margin: 0.85rem 0; }
+.paper .board-fig, .paper figure {
+  margin: 1.4rem 0 1.2rem;
+}
+.paper img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--rule);
 }
 .paper .empty h2 { font-family: var(--ui); }
 .paper .empty p { color: var(--muted); }
@@ -154,6 +166,14 @@ body {
   line-height: 1.25;
 }
 .paper h1 { font-size: 1.7rem; margin: 0 0 0.75rem; }
+.paper h1 .draft-tag,
+.paper h2 .draft-tag,
+.paper h3 .draft-tag,
+.paper h4 .draft-tag {
+  vertical-align: middle;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
 .paper h2 {
   font-size: 1.15rem;
   margin: 2rem 0 0.6rem;
@@ -360,6 +380,206 @@ body {
   border: 1px solid var(--rule);
   background: var(--paper);
   resize: vertical;
+}
+
+mark.draft-hl {
+  background: #fff2a8;
+  color: inherit;
+  padding: 0.05em 0;
+  cursor: pointer;
+  border-radius: 0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+mark.draft-hl.on {
+  background: #ffd45c;
+}
+.draft-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ui);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  margin: 0 0.12rem 0 0.15rem;
+  padding: 0 0.22rem;
+  color: #9a3d12;
+  background: #fde2b8;
+  border: 1px solid #d58a3a;
+  border-radius: 999px;
+  cursor: pointer;
+  vertical-align: super;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.draft-tag.on {
+  background: #f4b45a;
+  border-color: var(--accent-2);
+  color: #3a1d0a;
+}
+mark.draft-hl.done {
+  background: #e7efe8;
+  box-shadow: inset 0 -1px 0 #b7cbbd;
+}
+mark.draft-hl.done.on {
+  background: #cfe0d4;
+}
+.draft-tag.done {
+  color: #2d5a3d;
+  background: #e4eee6;
+  border-color: #8aaa94;
+}
+.draft-tag.done.on {
+  background: #b7d0be;
+  border-color: #2d5a3d;
+  color: #1c3a26;
+}
+.draft-tag.ghost {
+  opacity: 0.85;
+}
+.draft-ghosts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.12rem;
+  margin: -0.35rem 0 0.85rem;
+  font-weight: 400;
+  user-select: none;
+  -webkit-user-select: none;
+}
+mark.draft-hl mark.draft-hl {
+  box-shadow: inset 0 -2px 0 rgba(138, 59, 44, 0.35);
+}
+
+#comment-pop {
+  position: fixed;
+  z-index: 90;
+  width: min(26rem, calc(100vw - 1.5rem));
+  background: #fffdf8;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 0.75rem 0.85rem 0.85rem;
+  font: 0.88rem/1.4 var(--ui);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+#comment-pop[hidden] { display: none !important; }
+#comment-pop blockquote {
+  margin: 0.4rem 0 0.55rem;
+  padding: 0.35rem 0.55rem;
+  border-left: 3px solid var(--accent-2);
+  background: var(--paper);
+  font-family: var(--serif);
+  font-size: 0.92rem;
+  max-height: 6.5rem;
+  overflow: auto;
+}
+#comment-body {
+  width: 100%;
+  min-height: 5.5rem;
+  font: 0.9rem/1.45 var(--ui);
+  padding: 0.5rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  resize: vertical;
+}
+.comment-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.comment-card {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 0.5rem 0.55rem 0.55rem;
+  margin: 0 0 0.5rem;
+  cursor: pointer;
+}
+.comment-card:hover { border-color: var(--accent); }
+.comment-card.on { border-color: var(--accent-2); }
+.comment-card .quote {
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+.comment-card .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 0.68rem var(--ui);
+  min-width: 1.05rem;
+  height: 1.05rem;
+  margin-right: 0.35rem;
+  color: #9a3d12;
+  background: #fde2b8;
+  border: 1px solid #d58a3a;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.comment-card .note {
+  font-size: 0.86rem;
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+.comment-card .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  align-items: center;
+}
+.comment-card .del {
+  font: 650 0.72rem var(--ui);
+  border: 0;
+  background: none;
+  color: var(--hold);
+  cursor: pointer;
+  padding: 0;
+}
+.comment-card .act {
+  font: 650 0.72rem var(--ui);
+  border: 0;
+  background: none;
+  color: var(--ok);
+  cursor: pointer;
+  padding: 0;
+}
+.comment-card .card-actions {
+  display: flex;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+.comment-card.done {
+  opacity: 0.82;
+  background: #f3f4ef;
+}
+.comment-card.done .num.done {
+  color: #2d5a3d;
+  background: #e4eee6;
+  border-color: #8aaa94;
+}
+.done-block {
+  margin: 0.35rem 0 0.7rem;
+  border: 1px dashed var(--rule);
+  padding: 0.15rem 0.45rem 0.2rem;
+}
+.done-block summary {
+  cursor: pointer;
+  font: 650 0.78rem var(--ui);
+  color: var(--muted);
+  padding: 0.35rem 0;
+  list-style: none;
+}
+.done-block summary::-webkit-details-marker { display: none; }
+.done-block summary::before {
+  content: "▸ ";
+  font-size: 0.7rem;
+}
+.done-block[open] summary::before { content: "▾ "; }
+.done-block .comment-card {
+  margin-top: 0.4rem;
 }
 
 @media (max-width: 1100px) {

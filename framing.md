@@ -1,6 +1,6 @@
 # Framing note (Phase A)
 
-Status: v3 — freeze after peer review and 100-persona pass. No results.
+Status: v4 — framed amendment: value snapshot is civil night (E6), not terminator-nadir twilight. Nadir remains the Canady envelope.
 
 **Readable formulas:** [drafting board](whiteboard/index.html) (`python whiteboard/serve.py`) or [`notebooks/the_model.html`](notebooks/the_model.html). This file is the question freeze, not the typeset notebook.
 
@@ -8,7 +8,7 @@ Status: v3 — freeze after peer review and 100-persona pass. No results.
 
 ## 1. Question
 
-**Primary.** For a specular orbital reflector of collecting area \(A\) at altitude \(h\) with optical factor \(\eta\), what peak irradiance \(I_\text{peak}\), solar-image diameter \(D\), and dwell \(T\) can be delivered to Earth’s surface at a stated **terminator-nadir snapshot**, and which fact binds first: **energy** (including solar-image dilution from the Sun as an extended source) or the **orbital shutter**? A separate Ω fail (“spot too small”) is N/A for v1 classes unless a class required \(A_\text{target}<A_\text{image}\).
+**Primary.** For a specular orbital reflector of collecting area \(A\) at altitude \(h\) with optical factor \(\eta\), what peak irradiance \(I_\text{peak}\), solar-image diameter \(D\), and dwell \(T\) can be delivered to a **dark site** (civil night: Sun \(6^\circ\) below the horizon) from a still-sunlit terminator satellite, and which fact binds first: **energy** (including solar-image dilution) or the **orbital shutter**? Terminator-nadir twilight is the brighter envelope (Canady special case), not the value score. Local midnight nadir is usually umbra (\(I=0\)). Ω is N/A for v1 classes unless a class required \(A_\text{target}<A_\text{image}\).
 
 **Secondary.** After those quantities exist, compare them to parked application classes \((I^*, T^*)\). Classes do not choose \(A\), \(h\), or \(\eta\), and they do not alter the kernel.
 
@@ -54,7 +54,9 @@ No \(A_\text{farm}\) in v1.
 | M55 | 55 m | 3025 m² |
 | M1km | 1 km | \(1.00\times 10^6\) m² |
 
-**Default \(I\) snapshot:** terminator-nadir. Satellite over the terminator, nadir footpoint at dusk/dawn, collector incidence \(\gamma=45^\circ\), \(\varepsilon=90^\circ\), sunlit. This is **not** zenith over a deep-night dark target (that state is off-nadir or eclipsed). Envelope bias: **conservative vs daytime** (\(\gamma<45^\circ\), larger \(\cos\gamma\)); **optimistic vs deeper-night still-sunlit nadir** (\(\gamma>45^\circ\), smaller \(\cos\gamma\)) and vs lighting a dark site from a dawn-dusk orbit (off-nadir).
+**Value \(I\) snapshot (v4):** terminator-sunlit satellite, site \(\theta=6^\circ\) into the night (civil night). Closest approach. \(d>h\), \(\varepsilon<90^\circ\), foil incidence \(i\) from the bisector (not frozen at \(45^\circ\)). Coded as `night_snapshot` / `irradiance_night`.
+
+**Envelope \(I\) snapshot:** terminator-nadir, \(\gamma=45^\circ\), \(\varepsilon=90^\circ\), \(d=h\). Canady eqs. 10–13. Coded as `irradiance`. Conservative vs daytime; **optimistic vs the value case**.
 
 **Why twilight, not the darkest night.** A specular mirror can only bounce sunlight that is actually hitting it. At local midnight with the satellite overhead, low Earth orbit is usually in Earth’s shadow (umbra): the ground is dark *and* the mirror sees no Sun, so \(I=0\). The geometry that *can* light a dark city is different: satellite still sunlit, beam aimed off-nadir into the night. That case has longer range, a larger solar image, worse incidence, and needs an eclipse model. It is parked, not substituted. Terminator-nadir is the sunlit-overhead envelope, not a night-lighting claim. Do not read \(I\) here as “brightness at 2 a.m.”
 
@@ -101,9 +103,15 @@ Votes from the drafting board. Not freeze text until an iteration below is accep
 
 | Concept | Vote | Comment |
 |---|---|---|
-| Dusk/dawn snapshot, not midnight | **Agree** | Accepted iteration: keep twilight; midnight nadir is usually shadow. |
+| Dusk/dawn snapshot, not midnight | **agree** | Accepted iteration: keep terminator-nadir. Midnight overhead is usually umbra; dark-site lighting is off-nadir and parked. |
+| The question | **agree** |  |
+| What we vary vs what we freeze | **agree** |  |
+| The Sun is a disk, not a lamp | **agree** |  |
+| How we will score uses later | **agree** |  |
+| What we are not modeling | **agree** |  |
 
 <!-- iteration -->
+
 ### Iteration — twilight vs darkest night
 
 **Keep terminator-nadir.** Do not switch the kernel to local midnight looking straight down.
@@ -117,4 +125,3 @@ So twilight is not a claim that dusk is the application. It is the only nadir ge
 Accept this iteration to freeze the snapshot; reopen it only if v1 should add off-nadir dark-site lighting (new kernel, not a caption change).
 <!-- /iteration -->
 <!-- /board-review -->
-

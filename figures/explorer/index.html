@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Civil-night illumination — E6–E8 cases</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="panel">
+    <h1>Civil-night illumination</h1>
+    <p class="lede">Dawn–dusk polar orbit (SSO analog at 90°). Foils stay sunlit on the terminator; the kernel site is 6° into night. Continents stay put; the Sun and dusk walk. The trail is the ground track: next dusk crossing is ~24° west at 625 km (Earth rotation in one period), not a few degrees. Drawn foils are the duration train N_T, spaced by one useful window — not a packed square. An east–west orbit would put the foil in umbra, where I = 0.</p>
+
+    <label>Use
+      <select id="class">
+        <option value="C-moon">Moonlight · 0.003 W/m² · 1 pass</option>
+        <option value="C-light" selected>Street-class · 0.1 W/m² · 20 min</option>
+        <option value="C-weak">Weak PV · 50 W/m² · 20 min</option>
+        <option value="C-energy">Energy · 200 W/m² · 3 h</option>
+      </select>
+    </label>
+    <label>Orbit
+      <select id="h">
+        <option value="400">400 km (below night floor)</option>
+        <option value="625" selected>625 km</option>
+        <option value="1000">1000 km</option>
+        <option value="1500">1500 km (small-foil optimum)</option>
+        <option value="2000">2000 km</option>
+        <option value="3000">3000 km</option>
+      </select>
+    </label>
+    <label>Foil
+      <select id="foil">
+        <option value="M18" selected>M18 · 18 m square</option>
+        <option value="M55">M55 · 55 m square</option>
+        <option value="M1km">M1km · 1 km square</option>
+        <option value="sized">Sized to just hit I*</option>
+      </select>
+    </label>
+    <label>Optics
+      <select id="eta">
+        <option value="ideal" selected>Ideal η = 1</option>
+        <option value="realistic">Realistic η = 0.675</option>
+      </select>
+    </label>
+
+    <label class="check"><input type="checkbox" id="city-lights" checked> City lights</label>
+    <label class="check"><input type="checkbox" id="show-patch" checked> Foil patch (dusk site)</label>
+    <label class="check"><input type="checkbox" id="earth-view" checked> Full Earth view</label>
+
+    <div class="clock">
+      <button type="button" id="play">Pause</button>
+      <label class="speed">Speed
+        <input id="speed" type="range" min="1" max="500" step="1" value="3">
+        <span id="speed-read">3×</span>
+      </label>
+    </div>
+    <p class="hint" id="sim-read">Sim 0.0 h · orbit 0.0 min</p>
+
+    <div class="nav">
+      <button type="button" id="zoom-in">Zoom in</button>
+      <button type="button" id="zoom-out">Zoom out</button>
+      <button type="button" id="view-patch">Look at patch</button>
+      <button type="button" id="view-earth">Look at Earth</button>
+    </div>
+    <p class="hint">Two-finger drag spins the globe. Pinch or Ctrl+scroll zooms. Click-drag also spins.</p>
+
+    <dl id="stats"></dl>
+    <p class="stamp">The patch is the moving civil-night snapshot, not a fixed city. EST is local solar time at 75°W on the map — it does not follow the patch. Foils enlarged 900×; ground ellipse is true D (F15). N is one site. N_I is drawn only when N_T = 1 (a co-aimed cluster). Not photoreal; not a searchlight brightness scale.</p>
+  </aside>
+  <div id="view">
+    <div id="tod">
+      <div id="tod-time">— EST</div>
+      <div id="tod-day">Day 1 · solar time at 75°W (not the walking patch)</div>
+    </div>
+    <div id="hud">Loading Earth…</div>
+  </div>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="app.js?v=16"></script>
+</body>
+</html>
